@@ -9,7 +9,7 @@ public class ReservationTest {
         int validRoomId = 1;
 
         // Create (Insert a Reservation)
-        reservationDAO.addReservation(validGuestId, validRoomId, "2025-03-10", "2025-03-15", 500.00);
+        reservationDAO.addReservation(validGuestId, validRoomId, "2025-03-10", "2025-03-15", 500.00, "Pending");
 
         // Read (Retrieve Reservation by ID)
         reservationDAO.getReservationById(1);

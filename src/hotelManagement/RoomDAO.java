@@ -84,4 +84,88 @@ public class RoomDAO {
             e.printStackTrace();
         }
     }
+
+    // Check Room Availability (for a given date range)
+    public boolean isRoomAvailable(int roomId, String checkIn, String checkOut) {
+        String sql = "SELECT COUNT(*) FROM Reservations WHERE room_id = ? " + 
+                     "AND (check_in < ? AND check_out > ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, roomId);
+            stmt.setString(2, checkOut); // Requested checkOut > existing check_in
+            stmt.setString(3, checkIn);  // Requested checkIn < existing check_out
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0; // True if no conflict
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Automated Room Assignment based on Guest Preferences
+    public int assignRoomBasedOnPreferences(String roomType, String checkIn, String checkOut) {
+        String sql = "SELECT room_id FROM Rooms " +
+                     "WHERE room_type = ? AND status = 'Available' AND room_id NOT IN (" +
+                     "  SELECT room_id FROM Reservations " +
+                     "  WHERE (check_in < ? AND check_out > ?)) " +
+                     "LIMIT 1";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, roomType);
+            stmt.setString(2, checkOut);
+            stmt.setString(3, checkIn);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("room_id");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1; // Not found
+    }
+
+    // Flag Room for Maintenance
+    public void flagRoomForMaintenance(int roomId) {
+        String sql = "UPDATE Rooms SET status = 'Maintenance' WHERE room_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, roomId);
+
+            int rows = stmt.executeUpdate();
+            System.out.println("Room " + roomId + " flagged for maintenance.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Housekeeping Task Scheduling (Mark Room Status for Cleaning)
+    public void scheduleHousekeeping(int roomId, String taskStatus) {
+        String sql = "UPDATE Rooms SET status = ? WHERE room_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, taskStatus); // Clean, Dirty, In-progress
+            stmt.setInt(2, roomId);
+
+            int rows = stmt.executeUpdate();
+            System.out.println("Room " + roomId + " housekeeping status updated to: " + taskStatus);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

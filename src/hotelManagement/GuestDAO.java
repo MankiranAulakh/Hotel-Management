@@ -53,6 +53,68 @@ public class GuestDAO {
             e.printStackTrace();
         }
     }
+    
+ // READ (Retrieve Guest by ID)
+    public void getGuestById(int guestId) {
+        String sql = "SELECT * FROM Guests WHERE guest_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, guestId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("Guest ID: " + rs.getInt("guest_id"));
+                System.out.println("Name: " + rs.getString("first_name") + " " + rs.getString("last_name"));
+                System.out.println("Email: " + rs.getString("email"));
+                System.out.println("Phone: " + rs.getString("phone"));
+                System.out.println("Address: " + rs.getString("address"));
+                System.out.println("ID Proof: " + rs.getString("id_proof"));
+                System.out.println("---------------------------");
+            } else {
+                System.out.println("No guest found with ID: " + guestId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // READ (Retrieve Guests by First or Last Name)
+    public void getGuestsByName(String name) {
+        String sql = "SELECT * FROM Guests WHERE first_name LIKE ? OR last_name LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String queryParam = "%" + name + "%";
+            stmt.setString(1, queryParam);
+            stmt.setString(2, queryParam);
+
+            ResultSet rs = stmt.executeQuery();
+
+            boolean found = false;
+            while (rs.next()) {
+                found = true;
+                System.out.println("Guest ID: " + rs.getInt("guest_id"));
+                System.out.println("Name: " + rs.getString("first_name") + " " + rs.getString("last_name"));
+                System.out.println("Email: " + rs.getString("email"));
+                System.out.println("Phone: " + rs.getString("phone"));
+                System.out.println("Address: " + rs.getString("address"));
+                System.out.println("ID Proof: " + rs.getString("id_proof"));
+                System.out.println("---------------------------");
+            }
+
+            if (!found) {
+                System.out.println("No guests found with name containing: " + name);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // UPDATE (Modify Guest Information)
     public void updateGuestPhone(String email, String newPhone) {

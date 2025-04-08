@@ -15,7 +15,7 @@ public class GuestManagementScreen extends JFrame {
     public GuestManagementScreen() {
         // Frame setup
         setTitle("Guest Management");
-        setSize(800, 600);
+        setSize(600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -85,7 +85,7 @@ public class GuestManagementScreen extends JFrame {
         String address = addressField.getText();
 
         // Add guest to database
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://44.202.231.250:3306/testdb", "newuser", "password")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://18.212.186.57:3306/testdb", "newuser", "password")) {
             String sql = "INSERT INTO Guests (first_name, last_name, email, phone, address) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, firstName);
@@ -115,7 +115,7 @@ public class GuestManagementScreen extends JFrame {
             String address = addressField.getText();
 
             // Update guest in database
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://44.202.231.250:3306/testdb", "newuser", "password")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://18.212.186.57:3306/testdb", "newuser", "password")) {
                 String sql = "UPDATE Guests SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ? WHERE guest_id = ?";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, firstName);
@@ -143,7 +143,7 @@ public class GuestManagementScreen extends JFrame {
             int guestId = (int) guestTable.getValueAt(selectedRow, 0);
 
             // Delete guest from database
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://44.202.231.250:3306/testdb", "newuser", "password")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://18.212.186.57:3306/testdb", "newuser", "password")) {
                 String sql = "DELETE FROM Guests WHERE guest_id = ?";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setInt(1, guestId);
@@ -162,7 +162,7 @@ public class GuestManagementScreen extends JFrame {
 
     private void loadGuests() {
         tableModel.setRowCount(0);
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://44.202.231.250:3306/testdb", "newuser", "password")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://18.212.186.57:3306/testdb", "newuser", "password")) {
             String sql = "SELECT * FROM Guests";
             try (PreparedStatement statement = connection.prepareStatement(sql);
                  ResultSet resultSet = statement.executeQuery()) {

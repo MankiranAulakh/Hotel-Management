@@ -10,137 +10,136 @@ import java.sql.*;
 public class BillingScreen extends JFrame {
     private JTable table;
     private DefaultTableModel model;
-    private JTextField txtReservationId, txtGuestId, txtAmount, txtDiscount, txtMethod, txtStatus, txtBillingId;
-
+    private JTextField reservationIdField, guestIdField, totalAmountField, seasonalDiscountField, billingIdField;
+    private JComboBox<String> paymentMethodBox, transactionStatusBox; private JTextArea outputArea;
     private BillingDAO billingDAO;
 
     public BillingScreen() {
-        billingDAO = new BillingDAO();
-        setTitle("Billing & Payment Management");
+    	billingDAO = new BillingDAO();
+
+        setTitle("Billing & Payment");
+        setSize(600, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(900, 500);
-        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Table Setup
-        model = new DefaultTableModel(new String[]{"Billing ID", "Reservation ID", "Guest ID", "Amount", "Discount", "Method", "Status"}, 0);
-        table = new JTable(model);
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        // Input Panel
+        JPanel inputPanel = new JPanel(new GridLayout(8, 2, 10, 10));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Form Inputs
-        JPanel form = new JPanel(new GridLayout(3, 5, 10, 10));
-        txtBillingId = new JTextField();
-        txtReservationId = new JTextField();
-        txtGuestId = new JTextField();
-        txtAmount = new JTextField();
-        txtDiscount = new JTextField();
-        txtMethod = new JTextField();
-        txtStatus = new JTextField();
+        reservationIdField = new JTextField();
+        guestIdField = new JTextField();
+        totalAmountField = new JTextField();
+        seasonalDiscountField = new JTextField();
+        billingIdField = new JTextField();
 
-        form.add(new JLabel("Billing ID (for update/delete):"));
-        form.add(txtBillingId);
-        form.add(new JLabel("Reservation ID:"));
-        form.add(txtReservationId);
-        form.add(new JLabel("Guest ID:"));
-        form.add(txtGuestId);
-        form.add(new JLabel("Total Amount:"));
-        form.add(txtAmount);
-        form.add(new JLabel("Seasonal Discount:"));
-        form.add(txtDiscount);
-        form.add(new JLabel("Payment Method:"));
-        form.add(txtMethod);
-        form.add(new JLabel("Transaction Status:"));
-        form.add(txtStatus);
+        paymentMethodBox = new JComboBox<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Payment"});
+        transactionStatusBox = new JComboBox<>(new String[]{"Success", "Failed", "Pending"});
 
-        add(form, BorderLayout.NORTH);
+        inputPanel.add(new JLabel("Reservation ID:"));
+        inputPanel.add(reservationIdField);
+
+        inputPanel.add(new JLabel("Guest ID:"));
+        inputPanel.add(guestIdField);
+
+        inputPanel.add(new JLabel("Total Amount:"));
+        inputPanel.add(totalAmountField);
+
+        inputPanel.add(new JLabel("Seasonal Discount:"));
+        inputPanel.add(seasonalDiscountField);
+
+        inputPanel.add(new JLabel("Payment Method:"));
+        inputPanel.add(paymentMethodBox);
+
+        inputPanel.add(new JLabel("Transaction Status:"));
+        inputPanel.add(transactionStatusBox);
+
+        inputPanel.add(new JLabel("Billing ID (for Update/Delete):"));
+        inputPanel.add(billingIdField);
 
         // Buttons
-        JPanel buttons = new JPanel();
-        JButton btnAdd = new JButton("Add Billing");
-        JButton btnUpdate = new JButton("Update Status");
-        JButton btnDelete = new JButton("Delete Billing");
-        JButton btnRefresh = new JButton("Refresh");
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 10));
+        JButton addBtn = new JButton("Add");
+        JButton viewBtn = new JButton("View by Reservation");
+        JButton updateBtn = new JButton("Update Status");
+        JButton deleteBtn = new JButton("Delete");
 
-        buttons.add(btnAdd);
-        buttons.add(btnUpdate);
-        buttons.add(btnDelete);
-        buttons.add(btnRefresh);
-        add(buttons, BorderLayout.SOUTH);
+        buttonPanel.add(addBtn);
+        buttonPanel.add(viewBtn);
+        buttonPanel.add(updateBtn);
+        buttonPanel.add(deleteBtn);
 
-        // Button Listeners
-        btnAdd.addActionListener(e -> addBilling());
-        btnUpdate.addActionListener(e -> updateStatus());
-        btnDelete.addActionListener(e -> deleteBilling());
-        btnRefresh.addActionListener(e -> loadBilling());
+        // Output
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
 
-        loadBilling();
+        add(inputPanel, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.SOUTH);
+
+        // Button Actions
+        addBtn.addActionListener((ActionEvent e) -> {
+            try {
+                int reservationId = Integer.parseInt(reservationIdField.getText());
+                int guestId = Integer.parseInt(guestIdField.getText());
+                double total = Double.parseDouble(totalAmountField.getText());
+                double discount = Double.parseDouble(seasonalDiscountField.getText());
+                String method = (String) paymentMethodBox.getSelectedItem();
+                String status = (String) transactionStatusBox.getSelectedItem();
+
+                billingDAO.addBilling(reservationId, guestId, total, discount, method, status);
+                outputArea.setText("Billing record added.");
+            } catch (Exception ex) {
+                outputArea.setText("Error: " + ex.getMessage());
+            }
+        });
+
+        viewBtn.addActionListener((ActionEvent e) -> {
+            try {
+                int reservationId = Integer.parseInt(reservationIdField.getText());
+                outputArea.setText("");
+                billingDAO.getBillingByReservationId(reservationId);
+            } catch (Exception ex) {
+                outputArea.setText("Error: " + ex.getMessage());
+            }
+        });
+
+        updateBtn.addActionListener((ActionEvent e) -> {
+            try {
+                int billingId = Integer.parseInt(billingIdField.getText());
+                String newStatus = (String) transactionStatusBox.getSelectedItem();
+                billingDAO.updateBillingStatus(billingId, newStatus);
+                outputArea.setText("Billing status updated.");
+            } catch (Exception ex) {
+                outputArea.setText("Error: " + ex.getMessage());
+            }
+        });
+
+        deleteBtn.addActionListener((ActionEvent e) -> {
+            try {
+                int billingId = Integer.parseInt(billingIdField.getText());
+                billingDAO.deleteBilling(billingId);
+                outputArea.setText("Billing record deleted.");
+            } catch (Exception ex) {
+                outputArea.setText("Error: " + ex.getMessage());
+            }
+        });
+        
+        viewBtn.addActionListener((ActionEvent e) -> {
+            try {
+                int reservationId = Integer.parseInt(reservationIdField.getText());
+                String details = billingDAO.getBillingDetailsAsString(reservationId);
+                outputArea.setText(details);
+            } catch (Exception ex) {
+                outputArea.setText("Error: " + ex.getMessage());
+            }
+        });
+
+
         setVisible(true);
     }
 
-    private void addBilling() {
-        try {
-            int reservationId = Integer.parseInt(txtReservationId.getText());
-            int guestId = Integer.parseInt(txtGuestId.getText());
-            double amount = Double.parseDouble(txtAmount.getText());
-            double discount = Double.parseDouble(txtDiscount.getText());
-            String method = txtMethod.getText();
-            String status = txtStatus.getText();
-            billingDAO.addBilling(reservationId, guestId, amount, discount, method, status);
-            JOptionPane.showMessageDialog(this, "Billing added successfully.");
-            loadBilling();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error adding billing: " + e.getMessage());
-        }
-    }
-
-    private void updateStatus() {
-        try {
-            int billingId = Integer.parseInt(txtBillingId.getText());
-            String status = txtStatus.getText();
-            billingDAO.updateBillingStatus(billingId, status);
-            JOptionPane.showMessageDialog(this, "Transaction status updated.");
-            loadBilling();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error updating status: " + e.getMessage());
-        }
-    }
-
-    private void deleteBilling() {
-        try {
-            int billingId = Integer.parseInt(txtBillingId.getText());
-            billingDAO.deleteBilling(billingId);
-            JOptionPane.showMessageDialog(this, "Billing deleted.");
-            loadBilling();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error deleting billing: " + e.getMessage());
-        }
-    }
-
-    private void loadBilling() {
-        model.setRowCount(0);
-        String sql = "SELECT * FROM Billing";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Vector<Object> row = new Vector<>();
-                row.add(rs.getInt("billing_id"));
-                row.add(rs.getInt("reservation_id"));
-                row.add(rs.getInt("guest_id"));
-                row.add(rs.getDouble("total_amount"));
-                row.add(rs.getDouble("seasonal_discount"));
-                row.add(rs.getString("payment_method"));
-                row.add(rs.getString("transaction_status"));
-                model.addRow(row);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error loading billing data: " + e.getMessage());
-        }
-    }
-
-    // For testing
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new BillingScreen());
+        SwingUtilities.invokeLater(BillingScreen::new);
     }
 }
