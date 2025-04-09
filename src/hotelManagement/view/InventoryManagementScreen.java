@@ -1,6 +1,7 @@
-package hotelManagement;
+package hotelManagement.view;
 
-import hotelManagement.InventoryItem;
+import hotelManagement.dao.InventoryDAO;
+import hotelManagement.model.InventoryItem;
 
 import java.sql.*;
 import java.util.ArrayList;

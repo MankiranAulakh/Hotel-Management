@@ -1,4 +1,6 @@
-package hotelManagement;
+package hotelManagement.test;
+
+import hotelManagement.dao.RoomDAO;
 
 public class RoomTest {
     public static void main(String[] args) {

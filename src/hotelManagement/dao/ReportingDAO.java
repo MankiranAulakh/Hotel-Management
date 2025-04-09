@@ -1,9 +1,11 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import hotelManagement.DatabaseConnection;
 
 public class ReportingDAO {
 
@@ -12,7 +14,7 @@ public class ReportingDAO {
 	    String reportContent = "";
 	    String sql = "SELECT * FROM Reservations WHERE check_in BETWEEN ? AND ?";
 
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        stmt.setString(1, startDate);
 	        stmt.setString(2, endDate);
@@ -47,7 +49,7 @@ public class ReportingDAO {
 	                 "FROM Rooms r LEFT JOIN Reservations res ON r.room_id = res.room_id " +
 	                 "WHERE res.check_in BETWEEN ? AND ? GROUP BY r.room_number";
 
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        stmt.setString(1, startDate);
 	        stmt.setString(2, endDate);
@@ -76,7 +78,7 @@ public class ReportingDAO {
                      "FROM Housekeeping h JOIN Rooms r ON h.room_id = r.room_id " +
                      "WHERE h.last_cleaned BETWEEN ? AND ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, startDate);
             stmt.setString(2, endDate);
@@ -109,7 +111,7 @@ public class ReportingDAO {
                      "JOIN Guests g ON b.guest_id = g.guest_id " +
                      "WHERE b.created_at BETWEEN ? AND ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, startDate);
             stmt.setString(2, endDate);

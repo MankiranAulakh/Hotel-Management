@@ -1,4 +1,4 @@
-package hotelManagement;
+package hotelManagement.model;
 
 public class HousekeepingList {
     private int housekeepingId;

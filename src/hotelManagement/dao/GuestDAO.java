@@ -1,4 +1,4 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,13 +7,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import hotelManagement.DatabaseConnection;
+import hotelManagement.model.Guest;
+
 public class GuestDAO {
 
     // CREATE (Insert Guest)
     public void addGuest(String firstName, String lastName, String email, String phone, String address, String idProof) {
         String sql = "INSERT INTO Guests (first_name, last_name, email, phone, address, id_proof) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, firstName);
@@ -35,7 +38,7 @@ public class GuestDAO {
     public void getGuestByEmail(String email) {
         String sql = "SELECT * FROM Guests WHERE email = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);
@@ -60,7 +63,7 @@ public class GuestDAO {
     public void getGuestById(int guestId) {
         String sql = "SELECT * FROM Guests WHERE guest_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, guestId);
@@ -87,7 +90,7 @@ public class GuestDAO {
     public void getGuestsByName(String name) {
         String sql = "SELECT * FROM Guests WHERE first_name LIKE ? OR last_name LIKE ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             String queryParam = "%" + name + "%";
@@ -122,7 +125,7 @@ public class GuestDAO {
         List<Guest> guestList = new ArrayList<>();
         String sql = "SELECT * FROM Guests";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -151,7 +154,7 @@ public class GuestDAO {
     // UPDATE (Modify Guest Information)
     public boolean updateGuestPhone(String email, String newPhone) {
         String sql = "UPDATE Guests SET phone = ? WHERE email = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newPhone);
@@ -168,7 +171,7 @@ public class GuestDAO {
     // DELETE (Remove Guest)
     public boolean deleteGuest(String email) {
         String sql = "DELETE FROM Guests WHERE email = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);

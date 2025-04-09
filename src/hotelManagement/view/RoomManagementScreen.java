@@ -1,6 +1,9 @@
-package hotelManagement;
+package hotelManagement.view;
 
 import javax.swing.*;
+
+import hotelManagement.dao.RoomDAO;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

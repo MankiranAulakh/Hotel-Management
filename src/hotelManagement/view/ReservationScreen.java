@@ -1,7 +1,11 @@
-package hotelManagement;
+package hotelManagement.view;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import hotelManagement.DatabaseConnection;
+import hotelManagement.dao.ReservationDAO;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -76,8 +80,8 @@ public class ReservationScreen extends JFrame {
     }
 
     private void loadReservations() {
-        try (Connection con = DatabaseConnection.getConnection();
-             Statement stmt = con.createStatement();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Reservations")) {
 
             tableModel.setRowCount(0);

@@ -1,15 +1,17 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import hotelManagement.DatabaseConnection;
+
 public class BillingDAO {
 	public void addBilling(int reservationId, int guestId, double totalAmount, double seasonalDiscount, String paymentMethod, String transactionStatus) {
 		// Check if the reservation_id exists in the Reservations table
 	    String sqlcheck = "SELECT COUNT(*) FROM Reservations WHERE reservation_id = ?";
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sqlcheck)) {
 	        stmt.setInt(1, reservationId);
 	        ResultSet rs = stmt.executeQuery();
@@ -23,7 +25,7 @@ public class BillingDAO {
 		
 		String sql = "INSERT INTO Billing (reservation_id, guest_id, total_amount, seasonal_discount, payment_method, transaction_status) VALUES (?, ?, ?, ?, ?, ?)";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setInt(1, reservationId);
 	    	stmt.setInt(2, guestId);
@@ -43,7 +45,7 @@ public class BillingDAO {
 	public void getBillingByReservationId(int reservationId) {
 	    String sql = "SELECT * FROM Billing WHERE reservation_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setInt(1, reservationId);
 	        ResultSet resultSet = stmt.executeQuery();
@@ -68,7 +70,7 @@ public class BillingDAO {
 	public void updateBillingStatus(int billingId, String transactionStatus) {
 	    String sql = "UPDATE Billing SET transaction_status = ? WHERE bill_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setString(1, transactionStatus);
 	    	stmt.setInt(2, billingId);
@@ -87,7 +89,7 @@ public class BillingDAO {
 	public void deleteBilling(int billingId) {
 	    String sql = "DELETE FROM Billing WHERE bill_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setInt(1, billingId);
 	        int rowsDeleted = stmt.executeUpdate();
@@ -105,7 +107,7 @@ public class BillingDAO {
 	public String getBillingDetailsAsString(int reservationId) {
 	    StringBuilder output = new StringBuilder();
 	    String sql = "SELECT * FROM Billing WHERE reservation_id = ?";
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        stmt.setInt(1, reservationId);
 	        ResultSet rs = stmt.executeQuery();
@@ -129,7 +131,7 @@ public class BillingDAO {
 	
 	public double getReservationTotal(int reservationId) throws SQLException { 
 		String sql = "SELECT total_amount FROM Reservations WHERE reservation_id = ?"; 
-		try (Connection conn = DatabaseConnection.getConnection();
+		try (Connection conn = DatabaseConnection.getInstance().getConnection();
 		         PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, reservationId); 
 			ResultSet rs = stmt.executeQuery(); 

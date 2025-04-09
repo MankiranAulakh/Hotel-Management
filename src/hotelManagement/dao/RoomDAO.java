@@ -1,9 +1,11 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import hotelManagement.DatabaseConnection;
 
 public class RoomDAO {
 
@@ -11,7 +13,7 @@ public class RoomDAO {
     public void addRoom(String roomNumber, String roomType, double pricePerNight) {
         String sql = "INSERT INTO Rooms (room_number, room_type, price_per_night) VALUES (?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, roomNumber);
@@ -30,7 +32,7 @@ public class RoomDAO {
     public void getRoomByNumber(String roomNumber) {
         String sql = "SELECT * FROM Rooms WHERE room_number = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, roomNumber);
@@ -54,7 +56,7 @@ public class RoomDAO {
     public void updateRoomPrice(String roomNumber, double newPrice) {
         String sql = "UPDATE Rooms SET price_per_night = ? WHERE room_number = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDouble(1, newPrice);
@@ -72,7 +74,7 @@ public class RoomDAO {
     public void deleteRoom(String roomNumber) {
         String sql = "DELETE FROM Rooms WHERE room_number = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, roomNumber);
@@ -89,7 +91,7 @@ public class RoomDAO {
     public boolean isRoomAvailable(int roomId, String checkIn, String checkOut) {
         String sql = "SELECT COUNT(*) FROM Reservations WHERE room_id = ? " + 
                      "AND (check_in < ? AND check_out > ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, roomId);
@@ -115,7 +117,7 @@ public class RoomDAO {
                      "  WHERE (check_in < ? AND check_out > ?)) " +
                      "LIMIT 1";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, roomType);
@@ -138,7 +140,7 @@ public class RoomDAO {
     public void flagRoomForMaintenance(int roomId) {
         String sql = "UPDATE Rooms SET status = 'Maintenance' WHERE room_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, roomId);
@@ -155,7 +157,7 @@ public class RoomDAO {
     public void scheduleHousekeeping(int roomId, String taskStatus) {
         String sql = "UPDATE Rooms SET status = ? WHERE room_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, taskStatus); // Clean, Dirty, In-progress

@@ -1,6 +1,10 @@
-package hotelManagement;
+package hotelManagement.view;
 
 import javax.swing.*;
+
+import hotelManagement.dao.MaintenanceDAO;
+import hotelManagement.model.Maintenance;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;

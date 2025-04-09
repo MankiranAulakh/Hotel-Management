@@ -1,7 +1,10 @@
-package hotelManagement;
+package hotelManagement.view;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import hotelManagement.dao.BillingDAO;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;

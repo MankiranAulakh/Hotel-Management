@@ -1,4 +1,4 @@
-package hotelManagement;
+package hotelManagement.model;
 
 import java.sql.Timestamp;
 
@@ -14,12 +14,11 @@ public class Billing {
     private Timestamp createdAt;
 
     // Constructor
-    public Billing(int reservationId, int guestId, double totalAmount, double seasonalDiscount, String paymentMethod, String transactionStatus) {
+    public Billing(int reservationId, int guestId, double totalAmount, double seasonalDiscount, String transactionStatus) {
         this.reservationId = reservationId;
         this.guestId = guestId;
         this.totalAmount = totalAmount;
         this.seasonalDiscount = seasonalDiscount;
-        this.paymentMethod = paymentMethod;
         this.transactionStatus = transactionStatus;
     }
 
@@ -39,7 +38,15 @@ public class Billing {
     public double getSeasonalDiscount() { return seasonalDiscount; }
     public void setSeasonalDiscount(double seasonalDiscount) { this.seasonalDiscount = seasonalDiscount; }
 
-    public double getFinalAmount() { return finalAmount; }
+    public double getFinalAmount() {
+        return calculateFinalAmount();
+    }
+
+    // Calculate the final amount by applying the seasonal discount
+    private double calculateFinalAmount() {
+        return totalAmount - seasonalDiscount;
+    }
+
     public void setFinalAmount(double finalAmount) { this.finalAmount = finalAmount; }
 
     public String getPaymentMethod() { return paymentMethod; }

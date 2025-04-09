@@ -1,14 +1,17 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.*;
 import java.util.*;
+
+import hotelManagement.DatabaseConnection;
+import hotelManagement.model.HousekeepingList;
 
 public class HousekeepingDAO {
 
     public void addHousekeeping(int roomId, String assignedStaff, String cleaningStatus, String lastCleaned) {
         String sql = "INSERT INTO Housekeeping (room_id, assigned_staff, cleaning_status, last_cleaned) VALUES (?, ?, ?, ?)";
         
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, roomId);
             stmt.setString(2, assignedStaff);
@@ -24,7 +27,7 @@ public class HousekeepingDAO {
     public String getHousekeepingById(int housekeepingId) {
         String sql = "SELECT * FROM Housekeeping WHERE housekeeping_id = ?";
         StringBuilder result = new StringBuilder();
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, housekeepingId);
             ResultSet resultSet = stmt.executeQuery();
@@ -46,7 +49,7 @@ public class HousekeepingDAO {
     public void updateHousekeepingStatus(int housekeepingId, String cleaningStatus, String lastCleaned) {
         String sql = "UPDATE Housekeeping SET cleaning_status = ?, last_cleaned = ? WHERE housekeeping_id = ?";
         
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cleaningStatus);
             stmt.setString(2, lastCleaned);
@@ -66,7 +69,7 @@ public class HousekeepingDAO {
     public void deleteHousekeeping(int housekeepingId) {
         String sql = "DELETE FROM Housekeeping WHERE housekeeping_id = ?";
         
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, housekeepingId);
             int rowsDeleted = stmt.executeUpdate();
@@ -85,7 +88,7 @@ public class HousekeepingDAO {
         List<HousekeepingList> housekeepingList = new ArrayList<>();
         String sql = "SELECT housekeeping_id, room_id, assigned_staff, cleaning_status, last_cleaned FROM Housekeeping";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 

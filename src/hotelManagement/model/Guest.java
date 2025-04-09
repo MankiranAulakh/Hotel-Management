@@ -1,4 +1,4 @@
-package hotelManagement;
+package hotelManagement.model;
 
 public class Guest {
     private int guestId;

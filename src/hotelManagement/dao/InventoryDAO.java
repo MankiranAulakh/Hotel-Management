@@ -1,6 +1,10 @@
-package hotelManagement;
+package hotelManagement.dao;
 
-import hotelManagement.InventoryItem;
+import hotelManagement.DatabaseConnection;
+import hotelManagement.InventoryObserver.Inventory;
+import hotelManagement.InventoryObserver.InventoryNotifier;
+import hotelManagement.InventoryObserver.Observer;
+import hotelManagement.model.InventoryItem;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,10 +15,56 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InventoryDAO {
+
+	//private InventoryNotifier inventoryNotifier = new InventoryNotifier();
+	
+//	public void addObserver(Observer observer) {
+//        inventoryNotifier.addObserver(observer);
+//    }
+//
+//    public void removeObserver(Observer observer) {
+//        inventoryNotifier.removeObserver(observer);
+//    }
+//    
+//        private InventoryNotifier inventoryNotifier = new InventoryNotifier();
+//
+//        public void addObserver(Observer observer) {
+//            inventoryNotifier.addObserver(observer);
+//        }
+//
+//        public void removeObserver(Observer observer) {
+//            inventoryNotifier.removeObserver(observer);
+//        }
+//
+//        public void checkLowStock() {
+//            String sql = "SELECT item_id, item_name, quantity, reorder_level FROM Inventory WHERE quantity < reorder_level";
+//
+//            try (Connection conn = DatabaseConnection.getInstance().getConnection();
+//                 PreparedStatement stmt = conn.prepareStatement(sql);
+//                 ResultSet rs = stmt.executeQuery()) {
+//
+//                while (rs.next()) {
+//                    int itemId = rs.getInt("item_id");
+//                    String itemName = rs.getString("item_name");
+//                    int quantity = rs.getInt("quantity");
+//                    int reorderLevel = rs.getInt("reorder_level");
+//
+//                    if (quantity < reorderLevel) {
+//                        System.out.println("ALERT: " + itemName + " is below reorder level. Current stock: " + quantity);
+//                        // Notify observers about the low stock
+//                        inventoryNotifier.notifyObservers(itemName, quantity);
+//                    }
+//                }
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+	
 	public void addInventory(String itemName, String category, int quantity, int reorderLevel, int usageFrequency) {
 	    String sql = "INSERT INTO Inventory (item_name, category, quantity, reorder_level, usage_frequency) VALUES (?, ?, ?, ?, ?)";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setString(1, itemName);
 	    	stmt.setString(2, category);
@@ -31,7 +81,7 @@ public class InventoryDAO {
 	public void getInventoryById(int itemId) {
 	    String sql = "SELECT * FROM Inventory WHERE item_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setInt(1, itemId);
 	        ResultSet resultSet = stmt.executeQuery();
@@ -54,7 +104,7 @@ public class InventoryDAO {
 	public List<InventoryItem> getInventoryList() {
 	    List<InventoryItem> inventoryItems = new ArrayList<>();
 	    String sql = "SELECT * FROM Inventory"; // Assuming you have an 'inventory' table
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql);
 	         ResultSet rs = stmt.executeQuery(sql)) {
 	        
@@ -79,7 +129,7 @@ public class InventoryDAO {
 	public void updateInventoryQuantity(int itemId, int quantity) {
 	    String sql = "UPDATE Inventory SET quantity = ? WHERE item_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setInt(1, quantity);
 	    	stmt.setInt(2, itemId);
@@ -98,7 +148,7 @@ public class InventoryDAO {
 	public void deleteInventory(int itemId) {
 	    String sql = "DELETE FROM Inventory WHERE item_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setInt(1, itemId);
 	        int rowsDeleted = stmt.executeUpdate();
@@ -116,7 +166,7 @@ public class InventoryDAO {
 	public void checkLowStock() {
 	    String sql = "SELECT item_id, item_name, quantity, reorder_level FROM Inventory WHERE quantity < reorder_level";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql);
 	             ResultSet rs = stmt.executeQuery()) {
 	        
@@ -140,7 +190,7 @@ public class InventoryDAO {
 	public void updateUsageFrequency(int itemId, int quantityUsed) {
 	    String sql = "UPDATE Inventory SET quantity = quantity - ?, usage_frequency = usage_frequency + ? WHERE item_id = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        stmt.setInt(1, quantityUsed);
 	        stmt.setInt(2, quantityUsed);
@@ -160,7 +210,7 @@ public class InventoryDAO {
 	public void generateInventoryReport() {
 	    String sql = "SELECT * FROM Inventory ORDER BY category, item_name";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql);
 	             ResultSet rs = stmt.executeQuery()) {
 	        

@@ -1,9 +1,11 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import hotelManagement.DatabaseConnection;
 
 public class ReservationDAO {
 
@@ -11,7 +13,7 @@ public class ReservationDAO {
     public void addReservation(int guestId, int roomId, String checkIn, String checkOut, double totalAmount, String paymentStatus) {
         String sql = "INSERT INTO Reservations (guest_id, room_id, check_in, check_out, total_amount, payment_status) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, guestId);
@@ -37,7 +39,7 @@ public class ReservationDAO {
     public void getReservationById(int reservationId) {
         String sql = "SELECT * FROM Reservations WHERE reservation_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, reservationId);
@@ -63,7 +65,7 @@ public class ReservationDAO {
     public void updateReservation(int reservationId, int guestId, int roomId, String checkIn, String checkOut, double totalAmount, String paymentStatus) {
         String sql = "UPDATE Reservations SET guest_id = ?, room_id = ?, check_in = ?, check_out = ?, total_amount = ?, payment_status = ? WHERE reservation_id = ?";
         
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // Set the parameters for the prepared statement
@@ -92,7 +94,7 @@ public class ReservationDAO {
     public void updateCheckoutDate(int reservationId, String newCheckOut) {
         String sql = "UPDATE Reservations SET check_out = ? WHERE reservation_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newCheckOut);
@@ -114,7 +116,7 @@ public class ReservationDAO {
     public void cancelReservation(int reservationId) {
         String sql = "DELETE FROM Reservations WHERE reservation_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, reservationId);
@@ -134,7 +136,7 @@ public class ReservationDAO {
     public static boolean isRoomAvailable(int roomId, String checkIn, String checkOut) {
         String sql = "SELECT COUNT(*) FROM Reservations WHERE room_id = ? " + 
                      "AND (check_in < ? AND check_out > ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, roomId);
@@ -159,7 +161,7 @@ public class ReservationDAO {
                      "  WHERE (check_in < ? AND check_out > ?)) " +
                      "LIMIT 1";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, roomType);

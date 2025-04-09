@@ -1,15 +1,17 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import hotelManagement.DatabaseConnection;
+
 public class PricingDAO {
 	public void addPricing(String roomType, double baseRate, double seasonalRate, String effectiveFrom, String effectiveTo) {
 	    String sql = "INSERT INTO Pricing (room_type, base_rate, seasonal_rate, effective_from, effective_to) VALUES (?, ?, ?, ?, ?)";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setString(1, roomType);
 	    	stmt.setDouble(2, baseRate);
@@ -26,7 +28,7 @@ public class PricingDAO {
 	public void getPricingByRoomType(String roomType) {
 	    String sql = "SELECT * FROM Pricing WHERE room_type = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setString(1, roomType);
 	        ResultSet resultSet = stmt.executeQuery();
@@ -48,7 +50,7 @@ public class PricingDAO {
 	public void updatePricing(String roomType, double baseRate, double seasonalRate) {
 	    String sql = "UPDATE Pricing SET base_rate = ?, seasonal_rate = ? WHERE room_type = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setDouble(1, baseRate);
 	    	stmt.setDouble(2, seasonalRate);
@@ -68,7 +70,7 @@ public class PricingDAO {
 	public void deletePricing(String roomType) {
 	    String sql = "DELETE FROM Pricing WHERE room_type = ?";
 	    
-	    try (Connection conn = DatabaseConnection.getConnection();
+	    try (Connection conn = DatabaseConnection.getInstance().getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql)) {
 	    	stmt.setString(1, roomType);
 	        int rowsDeleted = stmt.executeUpdate();

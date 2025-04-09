@@ -1,15 +1,18 @@
-package hotelManagement;
+package hotelManagement.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import hotelManagement.DatabaseConnection;
+import hotelManagement.model.Maintenance;
 
 public class MaintenanceDAO {
     // Method to add a new maintenance record
     public void addMaintenance(int roomId, String issueDescription, String scheduledDate, String status) {
         String sql = "INSERT INTO Maintenance (room_id, issue_description, scheduled_date, status) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, roomId);
             stmt.setString(2, issueDescription);
@@ -26,7 +29,7 @@ public class MaintenanceDAO {
     public void getMaintenanceById(int maintenanceId) {
         String sql = "SELECT * FROM Maintenance WHERE maintenance_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, maintenanceId);
             ResultSet resultSet = stmt.executeQuery();
@@ -50,7 +53,7 @@ public class MaintenanceDAO {
         List<Maintenance> maintenanceList = new ArrayList<>();
         String sql = "SELECT * FROM Maintenance";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -74,7 +77,7 @@ public class MaintenanceDAO {
     public void updateMaintenanceStatus(int maintenanceId, String status) {
         String sql = "UPDATE Maintenance SET status = ? WHERE maintenance_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status);
             stmt.setInt(2, maintenanceId);
@@ -98,7 +101,7 @@ public class MaintenanceDAO {
     public void deleteMaintenance(int maintenanceId) {
         String sql = "DELETE FROM Maintenance WHERE maintenance_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, maintenanceId);
             int rowsDeleted = stmt.executeUpdate();
@@ -117,7 +120,7 @@ public class MaintenanceDAO {
     public void checkPendingMaintenance() {
         String sql = "SELECT maintenance_id, room_id, issue_description, scheduled_date FROM Maintenance WHERE status = 'Pending'";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
