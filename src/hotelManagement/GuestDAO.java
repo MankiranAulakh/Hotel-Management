@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuestDAO {
 
@@ -114,40 +116,68 @@ public class GuestDAO {
             e.printStackTrace();
         }
     }
+    
+ // READ (Retrieve List of All Guests)
+    public List<Guest> getGuestList() {
+        List<Guest> guestList = new ArrayList<>();
+        String sql = "SELECT * FROM Guests";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Guest guest = new Guest(
+                    rs.getInt("guest_id"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getString("address"),
+                    rs.getString("id_proof")
+                );
+                guestList.add(guest);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return guestList;
+    }
+
 
 
     // UPDATE (Modify Guest Information)
-    public void updateGuestPhone(String email, String newPhone) {
+    public boolean updateGuestPhone(String email, String newPhone) {
         String sql = "UPDATE Guests SET phone = ? WHERE email = ?";
-
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newPhone);
             stmt.setString(2, email);
-
             int rows = stmt.executeUpdate();
-            System.out.println(rows + " guest(s) updated successfully.");
+            return rows > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     // DELETE (Remove Guest)
-    public void deleteGuest(String email) {
+    public boolean deleteGuest(String email) {
         String sql = "DELETE FROM Guests WHERE email = ?";
-
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);
-
             int rows = stmt.executeUpdate();
-            System.out.println(rows + " guest(s) deleted successfully.");
+            return rows > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

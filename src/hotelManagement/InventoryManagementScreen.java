@@ -69,10 +69,14 @@ public class InventoryManagementScreen extends JFrame {
         JScrollPane tableScroll = new JScrollPane(inventoryTable);
 
         // Layout for the frame
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.CENTER);
-        add(tableScroll, BorderLayout.SOUTH);
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.add(panel);
+        mainPanel.add(buttonPanel);
+        mainPanel.add(tableScroll);
+
+        add(mainPanel);
+
 
         // Button Actions
         addButton.addActionListener(new ActionListener() {
@@ -163,6 +167,7 @@ public class InventoryManagementScreen extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
+        	
             @Override
             public void run() {
                 new InventoryManagementScreen().setVisible(true);

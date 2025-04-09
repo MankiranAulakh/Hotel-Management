@@ -62,11 +62,13 @@ public class BillingScreen extends JFrame {
         JButton viewBtn = new JButton("View by Reservation");
         JButton updateBtn = new JButton("Update Status");
         JButton deleteBtn = new JButton("Delete");
+        JButton calcTotalBtn = new JButton("Calculate Total");
 
         buttonPanel.add(addBtn);
         buttonPanel.add(viewBtn);
         buttonPanel.add(updateBtn);
         buttonPanel.add(deleteBtn);
+        buttonPanel.add(calcTotalBtn); 
 
         // Output
         outputArea = new JTextArea();
@@ -134,6 +136,26 @@ public class BillingScreen extends JFrame {
                 outputArea.setText("Error: " + ex.getMessage());
             }
         });
+        
+        calcTotalBtn.addActionListener((ActionEvent e) -> {
+        	try {
+        		int reservationId = Integer.parseInt(reservationIdField.getText());
+        		double reservationTotal = billingDAO.getReservationTotal(reservationId);
+        	    totalAmountField.setText(String.valueOf(reservationTotal));
+
+        	    double discount = 0.0;
+        	    if (!seasonalDiscountField.getText().isEmpty()) {
+        	        discount = Double.parseDouble(seasonalDiscountField.getText());
+        	    }
+
+        	    double finalAmount = reservationTotal - discount;
+        	    outputArea.setText("Total: " + reservationTotal + "\nDiscount: " + discount + "\nFinal Amount: " + finalAmount);
+        	} catch (Exception ex) {
+        	    outputArea.setText("Error: " + ex.getMessage());
+        	}
+        });
+        	
+        
 
 
         setVisible(true);

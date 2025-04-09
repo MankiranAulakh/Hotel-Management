@@ -1,87 +1,71 @@
 package hotelManagement;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class Maintenance {
-	public void addMaintenance(int roomId, String issueDescription, String scheduledDate, String status) {
-	    String sql = "INSERT INTO Maintenance (room_id, issue_description, scheduled_date, status) VALUES (?, ?, ?, ?)";
-	    
-	    try (Connection conn = DatabaseConnection.getConnection();
-	             PreparedStatement stmt = conn.prepareStatement(sql)) {
-	    	stmt.setInt(1, roomId);
-	    	stmt.setString(2, issueDescription);
-	    	stmt.setString(3, scheduledDate);
-	    	stmt.setString(4, status);
-	    	stmt.executeUpdate();
-	        System.out.println("Maintenance record added successfully.");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	}
-	
-	public void getMaintenanceById(int maintenanceId) {
-	    String sql = "SELECT * FROM Maintenance WHERE maintenance_id = ?";
-	    
-	    try (Connection conn = DatabaseConnection.getConnection();
-	             PreparedStatement stmt = conn.prepareStatement(sql)) {
-	    	stmt.setInt(1, maintenanceId);
-	        ResultSet resultSet = stmt.executeQuery();
-	        
-	        if (resultSet.next()) {
-	            System.out.println("Maintenance ID: " + resultSet.getInt("maintenance_id"));
-	            System.out.println("Room ID: " + resultSet.getInt("room_id"));
-	            System.out.println("Issue Description: " + resultSet.getString("issue_description"));
-	            System.out.println("Scheduled Date: " + resultSet.getString("scheduled_date"));
-	            System.out.println("Status: " + resultSet.getString("status"));
-	        } else {
-	            System.out.println("No maintenance record found with ID " + maintenanceId);
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	}
-	
-	public void updateMaintenanceStatus(int maintenanceId, String status) {
-	    String sql = "UPDATE Maintenance SET status = ? WHERE maintenance_id = ?";
-	    
-	    try (Connection conn = DatabaseConnection.getConnection();
-	             PreparedStatement stmt = conn.prepareStatement(sql)) {
-	    	stmt.setString(1, status);
-	    	stmt.setInt(2, maintenanceId);
-	        int rowsUpdated = stmt.executeUpdate();
-	        
-	        if (rowsUpdated > 0) {
-	            System.out.println("Maintenance record updated successfully.");
-	        } else {
-	            System.out.println("No maintenance record found with ID " + maintenanceId);
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	}
-	
-	public void deleteMaintenance(int maintenanceId) {
-	    String sql = "DELETE FROM Maintenance WHERE maintenance_id = ?";
-	    
-	    try (Connection conn = DatabaseConnection.getConnection();
-	             PreparedStatement stmt = conn.prepareStatement(sql)) {
-	    	stmt.setInt(1, maintenanceId);
-	        int rowsDeleted = stmt.executeUpdate();
-	        
-	        if (rowsDeleted > 0) {
-	            System.out.println("Maintenance record deleted successfully.");
-	        } else {
-	            System.out.println("No maintenance record found with ID " + maintenanceId);
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	}
+    private int maintenanceId;
+    private int roomId;
+    private String issueDescription;
+    private String scheduledDate;
+    private String status;
 
+    // Constructor
+    public Maintenance(int maintenanceId, int roomId, String issueDescription, String scheduledDate, String status) {
+        this.maintenanceId = maintenanceId;
+        this.roomId = roomId;
+        this.issueDescription = issueDescription;
+        this.scheduledDate = scheduledDate;
+        this.status = status;
+    }
 
+    // Getters and Setters
+    public int getMaintenanceId() {
+        return maintenanceId;
+    }
 
+    public void setMaintenanceId(int maintenanceId) {
+        this.maintenanceId = maintenanceId;
+    }
 
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getIssueDescription() {
+        return issueDescription;
+    }
+
+    public void setIssueDescription(String issueDescription) {
+        this.issueDescription = issueDescription;
+    }
+
+    public String getScheduledDate() {
+        return scheduledDate;
+    }
+
+    public void setScheduledDate(String scheduledDate) {
+        this.scheduledDate = scheduledDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // ToString Method
+    @Override
+    public String toString() {
+        return "Maintenance{" +
+                "maintenanceId=" + maintenanceId +
+                ", roomId=" + roomId +
+                ", issueDescription='" + issueDescription + '\'' +
+                ", scheduledDate='" + scheduledDate + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

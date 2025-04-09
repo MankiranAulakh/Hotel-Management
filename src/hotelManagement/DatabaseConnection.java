@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    private static final String URL = "jdbc:mysql://18.212.186.57:3306/testdb";
+    private static final String URL = "jdbc:mysql://18.212.49.142:3306/testdb";
     private static final String USER = "newuser";  // Replace with your MySQL username newuser
     private static final String PASSWORD = "password";  // Replace with your MySQL password
 

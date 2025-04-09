@@ -53,7 +53,7 @@ public class InventoryDAO {
 	
 	public List<InventoryItem> getInventoryList() {
 	    List<InventoryItem> inventoryItems = new ArrayList<>();
-	    String sql = "SELECT * FROM inventory"; // Assuming you have an 'inventory' table
+	    String sql = "SELECT * FROM Inventory"; // Assuming you have an 'inventory' table
 	    try (Connection conn = DatabaseConnection.getConnection();
 	             PreparedStatement stmt = conn.prepareStatement(sql);
 	         ResultSet rs = stmt.executeQuery(sql)) {

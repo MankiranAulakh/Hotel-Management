@@ -2,140 +2,190 @@ package hotelManagement;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class HousekeepingScreen extends JFrame {
     private JTextField housekeepingIdField, roomIdField, staffField, lastCleanedField;
     private JComboBox<String> statusComboBox;
+    private JButton addButton, updateButton, deleteButton, viewButton;
     private JTextArea displayArea;
-    private Housekeeping housekeepingDAO;
+    private JTable housekeepingTable;
+    private HousekeepingDAO housekeepingDAO;
 
     public HousekeepingScreen() {
-        housekeepingDAO = new Housekeeping();
+        housekeepingDAO = new HousekeepingDAO();
         setTitle("Housekeeping Management");
-        setSize(600, 600);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(600, 600); // Keep size consistent
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        // Panel for form fields
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new GridLayout(5, 2, 10, 10)); // GridLayout for the form
+        formPanel.setBorder(BorderFactory.createTitledBorder("Manage Housekeeping"));
 
-        // Row 0
-        gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("Housekeeping ID:"), gbc);
-        gbc.gridx = 1;
-        housekeepingIdField = new JTextField(10);
-        panel.add(housekeepingIdField, gbc);
+        // Form Fields
+        formPanel.add(new JLabel("Housekeeping ID:"));
+        housekeepingIdField = new JTextField(15);
+        formPanel.add(housekeepingIdField);
 
-        gbc.gridx = 2;
-        panel.add(new JLabel("Room ID:"), gbc);
-        gbc.gridx = 3;
-        roomIdField = new JTextField(10);
-        panel.add(roomIdField, gbc);
+        formPanel.add(new JLabel("Room ID:"));
+        roomIdField = new JTextField(15);
+        formPanel.add(roomIdField);
 
-        // Row 1
-        gbc.gridx = 0; gbc.gridy = 1;
-        panel.add(new JLabel("Assigned Staff:"), gbc);
-        gbc.gridx = 1;
+        formPanel.add(new JLabel("Assigned Staff:"));
         staffField = new JTextField(15);
-        panel.add(staffField, gbc);
+        formPanel.add(staffField);
 
-        gbc.gridx = 2;
-        panel.add(new JLabel("Cleaning Status:"), gbc);
-        gbc.gridx = 3;
-        statusComboBox = new JComboBox<>(new String[] {"Pending", "In Progress", "Completed"});
-        panel.add(statusComboBox, gbc);
+        formPanel.add(new JLabel("Cleaning Status:"));
+        statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
+        formPanel.add(statusComboBox);
 
-        // Row 2
-        gbc.gridx = 0; gbc.gridy = 2;
-        panel.add(new JLabel("Last Cleaned (yyyy-MM-dd HH:mm:ss):"), gbc);
-        gbc.gridx = 1;
+        formPanel.add(new JLabel("Last Cleaned (yyyy-MM-dd HH:mm:ss):"));
         lastCleanedField = new JTextField(15);
-        panel.add(lastCleanedField, gbc);
+        formPanel.add(lastCleanedField);
 
-        // Row 3 - Buttons
-        gbc.gridy = 3;
-        gbc.gridx = 0;
-        JButton addBtn = new JButton("Add");
-        panel.add(addBtn, gbc);
-        gbc.gridx = 1;
-        JButton viewBtn = new JButton("View");
-        panel.add(viewBtn, gbc);
-        gbc.gridx = 2;
-        JButton updateBtn = new JButton("Update");
-        panel.add(updateBtn, gbc);
-        gbc.gridx = 3;
-        JButton deleteBtn = new JButton("Delete");
-        panel.add(deleteBtn, gbc);
+        // Button panel with action buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        // Row 4 - Display Area
-        gbc.gridy = 4;
-        gbc.gridx = 0;
-        gbc.gridwidth = 4;
-        displayArea = new JTextArea(10, 50);
+        addButton = new JButton("Add Record");
+        updateButton = new JButton("Update Status");
+        deleteButton = new JButton("Delete Record");
+        viewButton = new JButton("View Record");
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(updateButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(viewButton);
+
+        // Display area for feedback messages
+        displayArea = new JTextArea(5, 50);
         displayArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(displayArea);
-        panel.add(scrollPane, gbc);
+        JScrollPane displayScroll = new JScrollPane(displayArea);
+        
+     // Table for viewing inventory
+        String[] columnNames = {"Item ID", "Item Name", "Category", "Quantity", "Reorder Level", "Usage Frequency"};
+        housekeepingTable = new JTable(new Object[0][6], columnNames);
+        JScrollPane tableScroll = new JScrollPane(housekeepingTable);
 
-        add(panel);
+        // Layout for the frame
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.add(formPanel);
+        mainPanel.add(buttonPanel);
+        mainPanel.add(tableScroll);
+
+        add(mainPanel);
 
         // Action Listeners
-        addBtn.addActionListener(new ActionListener() {
+        addButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int roomId = Integer.parseInt(roomIdField.getText());
-                    String staff = staffField.getText();
-                    String status = statusComboBox.getSelectedItem().toString();
-                    String lastCleaned = lastCleanedField.getText();
-                    housekeepingDAO.addHousekeeping(roomId, staff, status, lastCleaned);
-                    displayArea.setText("Housekeeping record added.");
-                } catch (Exception ex) {
-                    displayArea.setText("Error: " + ex.getMessage());
-                }
+                addHousekeeping();
             }
         });
 
-        viewBtn.addActionListener(new ActionListener() {
+        updateButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int id = Integer.parseInt(housekeepingIdField.getText());
-                    displayArea.setText("");
-                    housekeepingDAO.getHousekeepingById(id); // Still prints to console
-                } catch (Exception ex) {
-                    displayArea.setText("Error: " + ex.getMessage());
-                }
+                updateHousekeepingStatus();
             }
         });
 
-        updateBtn.addActionListener(new ActionListener() {
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int id = Integer.parseInt(housekeepingIdField.getText());
-                    String status = statusComboBox.getSelectedItem().toString();
-                    String lastCleaned = lastCleanedField.getText();
-                    housekeepingDAO.updateHousekeepingStatus(id, status, lastCleaned);
-                    displayArea.setText("Housekeeping status updated.");
-                } catch (Exception ex) {
-                    displayArea.setText("Error: " + ex.getMessage());
-                }
+                deleteHousekeepingRecord();
             }
         });
 
-        deleteBtn.addActionListener(new ActionListener() {
+        viewButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int id = Integer.parseInt(housekeepingIdField.getText());
-                    housekeepingDAO.deleteHousekeeping(id);
-                    displayArea.setText("Housekeeping record deleted.");
-                } catch (Exception ex) {
-                    displayArea.setText("Error: " + ex.getMessage());
-                }
+                viewHousekeeping();
             }
         });
+    }
+
+    private void addHousekeeping() {
+        String staff = staffField.getText();
+        String status = (String) statusComboBox.getSelectedItem();
+        String lastCleaned = lastCleanedField.getText();
+        int roomId = Integer.parseInt(roomIdField.getText());
+
+        // Call DAO method to add housekeeping record
+        housekeepingDAO.addHousekeeping(roomId, staff, status, lastCleaned);
+        displayArea.setText("Housekeeping record added successfully.");
+        clearFields();
+    }
+
+    private void updateHousekeepingStatus() {
+        // Get the Housekeeping ID
+        String housekeepingIdStr = JOptionPane.showInputDialog(this, "Enter Housekeeping ID to update status:");
+        int housekeepingId = Integer.parseInt(housekeepingIdStr);
+
+        // Get the new status
+        String newStatus = JOptionPane.showInputDialog(this, "Enter new status (Pending, In Progress, Completed):");
+
+        // Get the last cleaned date
+        String lastCleaned = JOptionPane.showInputDialog(this, "Enter last cleaned date (yyyy-MM-dd HH:mm:ss):");
+
+        // Update the status via DAO
+        housekeepingDAO.updateHousekeepingStatus(housekeepingId, newStatus, lastCleaned);
+        
+        // Display a success message
+        displayArea.setText("Housekeeping record updated successfully.");
+    }
+
+
+    private void deleteHousekeepingRecord() {
+        String housekeepingIdStr = JOptionPane.showInputDialog(this, "Enter Housekeeping ID to delete:");
+        int housekeepingId = Integer.parseInt(housekeepingIdStr);
+
+        // Delete via DAO
+        housekeepingDAO.deleteHousekeeping(housekeepingId);
+        displayArea.setText("Housekeeping record deleted successfully.");
+    }
+
+    private void viewHousekeepingRecord() {
+        String housekeepingIdStr = JOptionPane.showInputDialog(this, "Enter Housekeeping ID to view:");
+        int housekeepingId = Integer.parseInt(housekeepingIdStr);
+
+        String result = housekeepingDAO.getHousekeepingById(housekeepingId);
+        displayArea.setText(result);
+    }
+    
+    private void viewHousekeeping() {
+        // Retrieve the housekeeping data from the database
+        List<HousekeepingList> housekeepingList = housekeepingDAO.getHousekeepingList();
+
+        // Convert the housekeeping data into a 2D array for JTable
+        String[][] data = new String[housekeepingList.size()][5];
+        for (int i = 0; i < housekeepingList.size(); i++) {
+            HousekeepingList record = housekeepingList.get(i);
+            data[i][0] = String.valueOf(record.getHousekeepingId());
+            data[i][1] = String.valueOf(record.getRoomId());
+            data[i][2] = record.getStaff();
+            data[i][3] = record.getStatus();
+            data[i][4] = record.getLastCleaned();
+        }
+
+        // Update the table model with the retrieved data
+        housekeepingTable.setModel(new javax.swing.table.DefaultTableModel(data, new String[]{"Housekeeping ID", "Room ID", "Assigned Staff", "Cleaning Status", "Last Cleaned"}));
+    }
+
+
+    private void clearFields() {
+        housekeepingIdField.setText("");
+        roomIdField.setText("");
+        staffField.setText("");
+        lastCleanedField.setText("");
+        statusComboBox.setSelectedIndex(0);
     }
 
     public static void main(String[] args) {

@@ -63,6 +63,26 @@ public class ReportingScreen extends JFrame {
         String startDate = startDateField.getText();
         String endDate = endDateField.getText();
         
+     // Validate input dates
+        if (startDate.isEmpty() || endDate.isEmpty()) {
+            reportTextArea.setText("Please enter both start and end dates.");
+            return;
+        }
+        
+     // Simple date format validation
+        try {
+            java.sql.Date.valueOf(startDate); // Validate start date format
+            java.sql.Date.valueOf(endDate); // Validate end date format
+        } catch (IllegalArgumentException e) {
+            reportTextArea.setText("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+        }
+
+        if (startDate.compareTo(endDate) > 0) {
+            reportTextArea.setText("Start date cannot be later than end date.");
+            return;
+        }
+        
         ReportingDAO reportingDAO = new ReportingDAO();
         String reportContent = "";
         
