@@ -7,11 +7,11 @@ import hotelManagement.DatabaseConnection;
 import hotelManagement.dao.ReservationDAO;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.sql.*;
 
 public class ReservationScreen extends JFrame {
+    // UI Components
     private JTable table;
     private DefaultTableModel tableModel;
     private JTextField guestIdField, roomIdField, checkInField, checkOutField, amountField;
@@ -20,72 +20,99 @@ public class ReservationScreen extends JFrame {
 
     public ReservationScreen() {
         setTitle("Reservations Management");
-        setSize(700, 600);
+        setSize(750, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
 
-        tableModel = new DefaultTableModel();
-        table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
-
-        JPanel inputPanel = new JPanel(new GridLayout(7, 2));
-
-        inputPanel.add(new JLabel("Guest ID:"));
-        guestIdField = new JTextField();
-        inputPanel.add(guestIdField);
-
-        inputPanel.add(new JLabel("Room Type:"));
-        roomTypeBox = new JComboBox<>(new String[]{"Single", "Double", "Suite", "Deluxe"});
-        inputPanel.add(roomTypeBox);
-
-        findRoomButton = new JButton("Find Room");
-        inputPanel.add(findRoomButton);
-        inputPanel.add(new JLabel("")); // Empty placeholder
-
-        inputPanel.add(new JLabel("Room ID:"));
-        roomIdField = new JTextField();
-        inputPanel.add(roomIdField);
-
-        inputPanel.add(new JLabel("Check-in Date (YYYY-MM-DD):"));
-        checkInField = new JTextField();
-        inputPanel.add(checkInField);
-
-        inputPanel.add(new JLabel("Check-out Date (YYYY-MM-DD):"));
-        checkOutField = new JTextField();
-        inputPanel.add(checkOutField);
-
-        inputPanel.add(new JLabel("Total Amount:"));
-        amountField = new JTextField();
-        inputPanel.add(amountField);
-        
-        inputPanel.add(new JLabel("Payment Status:"));
-        paymentStatusBox = new JComboBox<>(new String[]{"Pending", "Paid", "Cancelled"});
-        inputPanel.add(paymentStatusBox);
-
-        addButton = new JButton("Add Reservation");
-        updateButton = new JButton("Update");
-        deleteButton = new JButton("Delete");
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(addButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(deleteButton);
-
-        add(inputPanel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.SOUTH);
+        initializeTable();
+        add(createInputPanel(), BorderLayout.NORTH);
+        add(createButtonPanel(), BorderLayout.SOUTH);
 
         loadReservations();
         addEventListeners();
     }
 
+    // ========================= Initialize Table =========================
+    private void initializeTable() {
+        tableModel = new DefaultTableModel();
+        table = new JTable(tableModel);
+        table.setFillsViewportHeight(true);
+        table.setRowHeight(22);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+ // ========================= Input Panel =========================
+    private JPanel createInputPanel() {
+        JPanel panel = new JPanel(new GridLayout(8, 2, 10, 10)); // 8 rows, 2 columns
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(new Color(181, 247, 209)); // Soft background
+
+        guestIdField = new JTextField();
+        roomTypeBox = new JComboBox<>(new String[]{"Single", "Double", "Suite", "Deluxe"});
+        findRoomButton = new JButton("Find Room");
+        roomIdField = new JTextField();
+        checkInField = new JTextField();
+        checkOutField = new JTextField();
+        amountField = new JTextField();
+        paymentStatusBox = new JComboBox<>(new String[]{"Pending", "Paid", "Cancelled"});
+
+        panel.add(new JLabel("Guest ID:"));
+        panel.add(guestIdField);
+
+        panel.add(new JLabel("Room Type:"));
+        panel.add(roomTypeBox);
+
+        panel.add(new JLabel("")); // Empty cell for alignment
+        panel.add(findRoomButton); // Place Find Room button in the second column
+
+        panel.add(new JLabel("Room ID:"));
+        panel.add(roomIdField);
+
+        panel.add(new JLabel("Check-in Date (YYYY-MM-DD):"));
+        panel.add(checkInField);
+
+        panel.add(new JLabel("Check-out Date (YYYY-MM-DD):"));
+        panel.add(checkOutField);
+
+        panel.add(new JLabel("Total Amount:"));
+        panel.add(amountField);
+
+        panel.add(new JLabel("Payment Status:"));
+        panel.add(paymentStatusBox);
+
+        return panel;
+    }
+
+
+    // ========================= Button Panel =========================
+    private JPanel createButtonPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        addButton = new JButton("Add Reservation");
+        updateButton = new JButton("Update");
+        deleteButton = new JButton("Delete");
+
+        panel.add(addButton);
+        panel.add(updateButton);
+        panel.add(deleteButton);
+
+        return panel;
+    }
+
+    // ========================= Load Reservations from DB =========================
     private void loadReservations() {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Reservations")) {
 
             tableModel.setRowCount(0);
-            tableModel.setColumnIdentifiers(new String[]{"ID", "Guest ID", "Room ID", "Check-in", "Check-out", "Amount", "Payment Status"});
+            tableModel.setColumnIdentifiers(new String[]{
+                "ID", "Guest ID", "Room ID", "Check-in", "Check-out", "Amount", "Payment Status"
+            });
 
             while (rs.next()) {
                 tableModel.addRow(new Object[]{
@@ -99,101 +126,119 @@ public class ReservationScreen extends JFrame {
                 });
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            showError("Error loading reservations: " + e.getMessage());
         }
     }
 
+    // ========================= Event Listeners =========================
     private void addEventListeners() {
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        // Add Reservation
+        addButton.addActionListener(e -> {
+            try {
+                int guestId = Integer.parseInt(guestIdField.getText());
+                int roomId = Integer.parseInt(roomIdField.getText());
+                String checkIn = checkInField.getText();
+                String checkOut = checkOutField.getText();
+                double totalAmount = Double.parseDouble(amountField.getText());
+                String paymentStatus = (String) paymentStatusBox.getSelectedItem();
+
+                boolean available = ReservationDAO.isRoomAvailable(roomId, checkIn, checkOut);
+                if (available) {
+                    new ReservationDAO().addReservation(guestId, roomId, checkIn, checkOut, totalAmount, paymentStatus);
+                    loadReservations();
+                    clearInputs();
+                } else {
+                    showError("Room is not available for selected dates.");
+                }
+            } catch (Exception ex) {
+                showError("Error adding reservation: " + ex.getMessage());
+            }
+        });
+
+        // Update Reservation
+        updateButton.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
                 try {
+                    int reservationId = (int) tableModel.getValueAt(row, 0);
                     int guestId = Integer.parseInt(guestIdField.getText());
                     int roomId = Integer.parseInt(roomIdField.getText());
                     String checkIn = checkInField.getText();
                     String checkOut = checkOutField.getText();
-                    String paymentStatus = (String) paymentStatusBox.getSelectedItem();
                     double totalAmount = Double.parseDouble(amountField.getText());
+                    String paymentStatus = (String) paymentStatusBox.getSelectedItem();
 
-                    boolean isAvailable = ReservationDAO.isRoomAvailable(roomId, checkIn, checkOut);
-
-                    if (isAvailable) {
-                        ReservationDAO dao = new ReservationDAO();
-                        dao.addReservation(guestId, roomId, checkIn, checkOut, totalAmount, paymentStatus);
-                        loadReservations();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Room is not available for the selected dates.");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
-                }
-            }
-        });
-        
-        updateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow != -1) {
-                    try {
-                        int reservationId = (int) tableModel.getValueAt(selectedRow, 0);
-                        int guestId = Integer.parseInt(guestIdField.getText());
-                        int roomId = Integer.parseInt(roomIdField.getText());
-                        String checkIn = checkInField.getText();
-                        String checkOut = checkOutField.getText();
-                        String paymentStatus = (String) paymentStatusBox.getSelectedItem();
-                        double totalAmount = Double.parseDouble(amountField.getText());
-
-                        // Now include guestId in the update logic if required
-                        ReservationDAO dao = new ReservationDAO();
-                        dao.updateReservation(reservationId, guestId, roomId, checkIn, checkOut, totalAmount, paymentStatus); // Assuming you want to update all fields
-
-                        // Reload the reservations table after the update
-                        loadReservations();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please select a reservation to update.");
-                }
-            }
-        });
-
-
-
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow != -1) {
-                    int id = (int) tableModel.getValueAt(selectedRow, 0);
-                    ReservationDAO dao = new ReservationDAO();
-                    dao.cancelReservation(id);
-
-                    // After cancellation, reload reservations and show success message
+                    new ReservationDAO().updateReservation(reservationId, guestId, roomId, checkIn, checkOut, totalAmount, paymentStatus);
                     loadReservations();
-                    JOptionPane.showMessageDialog(null, "Reservation successfully cancelled.");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please select a reservation to cancel.");
+                    clearInputs();
+                } catch (Exception ex) {
+                    showError("Error updating reservation: " + ex.getMessage());
                 }
+            } else {
+                showError("Please select a reservation to update.");
             }
         });
 
+        // Delete Reservation
+        deleteButton.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                int id = (int) tableModel.getValueAt(row, 0);
+                new ReservationDAO().cancelReservation(id);
+                loadReservations();
+                showMessage("Reservation successfully cancelled.");
+            } else {
+                showError("Please select a reservation to cancel.");
+            }
+        });
 
-        findRoomButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String roomType = (String) roomTypeBox.getSelectedItem();
-                String checkIn = checkInField.getText();
-                String checkOut = checkOutField.getText();
+        // Find Available Room
+        findRoomButton.addActionListener(e -> {
+            String roomType = (String) roomTypeBox.getSelectedItem();
+            String checkIn = checkInField.getText();
+            String checkOut = checkOutField.getText();
 
-                int roomId = ReservationDAO.findAvailableRoom(roomType, checkIn, checkOut);
+            int roomId = ReservationDAO.findAvailableRoom(roomType, checkIn, checkOut);
+            if (roomId != -1) {
+                roomIdField.setText(String.valueOf(roomId));
+                showMessage("Found Room ID: " + roomId);
+            } else {
+                showError("No available room found for selected type and dates.");
+            }
+        });
 
-                if (roomId != -1) {
-                    roomIdField.setText(String.valueOf(roomId));
-                    JOptionPane.showMessageDialog(null, "Found Room ID: " + roomId);
-                } else {
-                    JOptionPane.showMessageDialog(null, "No available room found for selected type and dates.");
+        // Table Click Listener to Populate Fields
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int row = table.getSelectedRow();
+                if (row != -1) {
+                    guestIdField.setText(String.valueOf(tableModel.getValueAt(row, 1)));
+                    roomIdField.setText(String.valueOf(tableModel.getValueAt(row, 2)));
+                    checkInField.setText(String.valueOf(tableModel.getValueAt(row, 3)));
+                    checkOutField.setText(String.valueOf(tableModel.getValueAt(row, 4)));
+                    amountField.setText(String.valueOf(tableModel.getValueAt(row, 5)));
+                    paymentStatusBox.setSelectedItem(String.valueOf(tableModel.getValueAt(row, 6)));
                 }
             }
         });
+    }
+
+    // ========================= Helper Methods =========================
+    private void clearInputs() {
+        guestIdField.setText("");
+        roomIdField.setText("");
+        checkInField.setText("");
+        checkOutField.setText("");
+        amountField.setText("");
+        paymentStatusBox.setSelectedIndex(0);
+        roomTypeBox.setSelectedIndex(0);
+    }
+
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    private void showError(String error) {
+        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

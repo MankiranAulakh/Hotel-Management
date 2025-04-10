@@ -1,33 +1,36 @@
 package hotelManagement.view;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-
 import hotelManagement.dao.BillingDAO;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Vector;
-import java.sql.*;
 
 public class BillingScreen extends JFrame {
-    private JTable table;
-    private DefaultTableModel model;
     private JTextField reservationIdField, guestIdField, totalAmountField, seasonalDiscountField, billingIdField;
-    private JComboBox<String> paymentMethodBox, transactionStatusBox; private JTextArea outputArea;
+    private JComboBox<String> paymentMethodBox, transactionStatusBox;
+    private JTextArea outputArea;
     private BillingDAO billingDAO;
 
     public BillingScreen() {
-    	billingDAO = new BillingDAO();
-
-        setTitle("Billing & Payment");
-        setSize(600, 600);
+        billingDAO = new BillingDAO();
+        setTitle("💳 Billing & Payment");
+        setSize(750, 700);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(15, 15));
+        getContentPane().setBackground(Color.decode("#f4f6f8"));
 
-        // Input Panel
-        JPanel inputPanel = new JPanel(new GridLayout(8, 2, 10, 10));
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        // ===== Title =====
+        JLabel titleLabel = new JLabel("Billing & Payment", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        add(titleLabel, BorderLayout.NORTH);
+
+        // ===== Input Panel =====
+        JPanel inputPanel = new JPanel(new GridLayout(7, 2, 12, 12));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Billing Information"));
+        inputPanel.setBackground(Color.white);
 
         reservationIdField = new JTextField();
         guestIdField = new JTextField();
@@ -56,34 +59,41 @@ public class BillingScreen extends JFrame {
         inputPanel.add(new JLabel("Transaction Status:"));
         inputPanel.add(transactionStatusBox);
 
-        inputPanel.add(new JLabel("Billing ID (for Update/Delete):"));
+        inputPanel.add(new JLabel("Billing ID (Update/Delete):"));
         inputPanel.add(billingIdField);
 
-        // Buttons
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 10));
-        JButton addBtn = new JButton("Add");
-        JButton viewBtn = new JButton("View by Reservation");
-        JButton updateBtn = new JButton("Update Status");
-        JButton deleteBtn = new JButton("Delete");
-        JButton calcTotalBtn = new JButton("Calculate Total");
+        add(inputPanel, BorderLayout.WEST);
+
+        // ===== Button Panel =====
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        buttonPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
+        buttonPanel.setBackground(Color.white);
+        JButton addBtn = createStyledButton("Add Billing");
+        JButton viewBtn = createStyledButton("View by Reservation");
+        JButton updateBtn = createStyledButton("Update Status");
+        JButton deleteBtn = createStyledButton("Delete");
+        JButton calcTotalBtn = createStyledButton("Calculate Total");
 
         buttonPanel.add(addBtn);
         buttonPanel.add(viewBtn);
         buttonPanel.add(updateBtn);
         buttonPanel.add(deleteBtn);
-        buttonPanel.add(calcTotalBtn); 
+        buttonPanel.add(calcTotalBtn);
 
-        // Output
-        outputArea = new JTextArea();
+        add(buttonPanel, BorderLayout.CENTER);
+
+        // ===== Output Panel =====
+        outputArea = new JTextArea(10, 40);
+        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        outputArea.setLineWrap(true);
+        outputArea.setWrapStyleWord(true);
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
-
-        add(inputPanel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.CENTER);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Output"));
         add(scrollPane, BorderLayout.SOUTH);
 
-        // Button Actions
-        addBtn.addActionListener((ActionEvent e) -> {
+        // ===== Button Actions =====
+        addBtn.addActionListener(e -> {
             try {
                 int reservationId = Integer.parseInt(reservationIdField.getText());
                 int guestId = Integer.parseInt(guestIdField.getText());
@@ -91,77 +101,70 @@ public class BillingScreen extends JFrame {
                 double discount = Double.parseDouble(seasonalDiscountField.getText());
                 String method = (String) paymentMethodBox.getSelectedItem();
                 String status = (String) transactionStatusBox.getSelectedItem();
-
                 billingDAO.addBilling(reservationId, guestId, total, discount, method, status);
-                outputArea.setText("Billing record added.");
+                outputArea.setText("✅ Billing record added successfully.");
             } catch (Exception ex) {
-                outputArea.setText("Error: " + ex.getMessage());
+                outputArea.setText("❌ Error: " + ex.getMessage());
             }
         });
 
-        viewBtn.addActionListener((ActionEvent e) -> {
-            try {
-                int reservationId = Integer.parseInt(reservationIdField.getText());
-                outputArea.setText("");
-                billingDAO.getBillingByReservationId(reservationId);
-            } catch (Exception ex) {
-                outputArea.setText("Error: " + ex.getMessage());
-            }
-        });
-
-        updateBtn.addActionListener((ActionEvent e) -> {
-            try {
-                int billingId = Integer.parseInt(billingIdField.getText());
-                String newStatus = (String) transactionStatusBox.getSelectedItem();
-                billingDAO.updateBillingStatus(billingId, newStatus);
-                outputArea.setText("Billing status updated.");
-            } catch (Exception ex) {
-                outputArea.setText("Error: " + ex.getMessage());
-            }
-        });
-
-        deleteBtn.addActionListener((ActionEvent e) -> {
-            try {
-                int billingId = Integer.parseInt(billingIdField.getText());
-                billingDAO.deleteBilling(billingId);
-                outputArea.setText("Billing record deleted.");
-            } catch (Exception ex) {
-                outputArea.setText("Error: " + ex.getMessage());
-            }
-        });
-        
-        viewBtn.addActionListener((ActionEvent e) -> {
+        viewBtn.addActionListener(e -> {
             try {
                 int reservationId = Integer.parseInt(reservationIdField.getText());
                 String details = billingDAO.getBillingDetailsAsString(reservationId);
                 outputArea.setText(details);
             } catch (Exception ex) {
-                outputArea.setText("Error: " + ex.getMessage());
+                outputArea.setText("❌ Error: " + ex.getMessage());
             }
         });
-        
-        calcTotalBtn.addActionListener((ActionEvent e) -> {
-        	try {
-        		int reservationId = Integer.parseInt(reservationIdField.getText());
-        		double reservationTotal = billingDAO.getReservationTotal(reservationId);
-        	    totalAmountField.setText(String.valueOf(reservationTotal));
 
-        	    double discount = 0.0;
-        	    if (!seasonalDiscountField.getText().isEmpty()) {
-        	        discount = Double.parseDouble(seasonalDiscountField.getText());
-        	    }
-
-        	    double finalAmount = reservationTotal - discount;
-        	    outputArea.setText("Total: " + reservationTotal + "\nDiscount: " + discount + "\nFinal Amount: " + finalAmount);
-        	} catch (Exception ex) {
-        	    outputArea.setText("Error: " + ex.getMessage());
-        	}
+        updateBtn.addActionListener(e -> {
+            try {
+                int billingId = Integer.parseInt(billingIdField.getText());
+                String newStatus = (String) transactionStatusBox.getSelectedItem();
+                billingDAO.updateBillingStatus(billingId, newStatus);
+                outputArea.setText("🔄 Billing status updated.");
+            } catch (Exception ex) {
+                outputArea.setText("❌ Error: " + ex.getMessage());
+            }
         });
-        	
-        
 
+        deleteBtn.addActionListener(e -> {
+            try {
+                int billingId = Integer.parseInt(billingIdField.getText());
+                billingDAO.deleteBilling(billingId);
+                outputArea.setText("🗑️ Billing record deleted.");
+            } catch (Exception ex) {
+                outputArea.setText("❌ Error: " + ex.getMessage());
+            }
+        });
+
+        calcTotalBtn.addActionListener(e -> {
+            try {
+                int reservationId = Integer.parseInt(reservationIdField.getText());
+                double reservationTotal = billingDAO.getReservationTotal(reservationId);
+                totalAmountField.setText(String.valueOf(reservationTotal));
+                double discount = 0.0;
+                if (!seasonalDiscountField.getText().isEmpty()) {
+                    discount = Double.parseDouble(seasonalDiscountField.getText());
+                }
+                double finalAmount = reservationTotal - discount;
+                outputArea.setText("💰 Total: " + reservationTotal + "\n💸 Discount: " + discount + "\n🧾 Final Amount: " + finalAmount);
+            } catch (Exception ex) {
+                outputArea.setText("❌ Error: " + ex.getMessage());
+            }
+        });
 
         setVisible(true);
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        return button;
     }
 
     public static void main(String[] args) {

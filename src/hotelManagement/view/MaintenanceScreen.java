@@ -1,15 +1,15 @@
 package hotelManagement.view;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 import hotelManagement.dao.MaintenanceDAO;
 import hotelManagement.model.Maintenance;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MaintenanceScreen extends JFrame {
 
@@ -21,92 +21,111 @@ public class MaintenanceScreen extends JFrame {
     public MaintenanceScreen() {
         maintenanceDAO = new MaintenanceDAO();
         setTitle("Maintenance Management");
-        setSize(600, 600); // Consistent size with Inventory screen
+        setSize(750, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Panel for the form and buttons
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 2, 10, 10)); // Use GridLayout for simplicity and neatness
-        panel.setBorder(BorderFactory.createTitledBorder("Manage Maintenance"));
+        Color bgColor = new Color(245, 248, 250);
+        Color formColor = new Color(247, 220, 218);
+        Font labelFont = new Font("Segoe UI", Font.PLAIN, 14);
+        Font titleFont = new Font("Segoe UI", Font.BOLD, 20);
 
-        // Adding form fields
-        panel.add(new JLabel("Room ID:"));
-        roomIdField = new JTextField(15);
-        panel.add(roomIdField);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(bgColor);
 
-        panel.add(new JLabel("Issue Description:"));
-        issueField = new JTextField(15);
-        panel.add(issueField);
+        // Top Panel - Title
+        JPanel topPanel = new JPanel();
+        topPanel.setBackground(new Color(162, 215, 250));
+        JLabel titleLabel = new JLabel("Maintenance Management");
+        titleLabel.setFont(titleFont);
+        topPanel.add(titleLabel);
 
-        panel.add(new JLabel("Scheduled Date (YYYY-MM-DD):"));
-        scheduledDateField = new JTextField(15);
-        panel.add(scheduledDateField);
+        // Form Panel
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(formColor);
+        formPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
 
-        panel.add(new JLabel("Status (Pending/In Progress/Completed):"));
-        statusField = new JTextField(15);
-        panel.add(statusField);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        panel.add(new JLabel("Maintenance ID:"));
-        maintenanceIdField = new JTextField(15);
-        panel.add(maintenanceIdField);
+        JLabel[] labels = {
+            new JLabel("Room ID:"), new JLabel("Issue Description:"),
+            new JLabel("Scheduled Date (YYYY-MM-DD):"), new JLabel("Status (Pending/In Progress/Completed):"),
+            new JLabel("Maintenance ID:")
+        };
 
-        // Button panel with action buttons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        JTextField[] fields = {
+            roomIdField = new JTextField(15),
+            issueField = new JTextField(15),
+            scheduledDateField = new JTextField(15),
+            statusField = new JTextField(15),
+            maintenanceIdField = new JTextField(15)
+        };
 
-        addButton = new JButton("Add Maintenance");
-        updateButton = new JButton("Update Status");
-        deleteButton = new JButton("Delete Maintenance");
-        viewButton = new JButton("View Maintenance");
+        for (int i = 0; i < labels.length; i++) {
+            labels[i].setFont(labelFont);
+            gbc.gridx = 0; gbc.gridy = i;
+            formPanel.add(labels[i], gbc);
+            gbc.gridx = 1;
+            formPanel.add(fields[i], gbc);
+        }
+
+        // Button Panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(bgColor);
+
+        addButton = createStyledButton("Add");
+        updateButton = createStyledButton("Update");
+        deleteButton = createStyledButton("Delete");
+        viewButton = createStyledButton("View");
 
         buttonPanel.add(addButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(viewButton);
 
-        // Table for viewing maintenance records
-        String[] columnNames = {"Maintenance ID", "Room ID", "Issue", "Scheduled Date", "Status"};
-        maintenanceTable = new JTable(new Object[0][5], columnNames);
+        // Table Panel
+        maintenanceTable = new JTable();
         JScrollPane tableScroll = new JScrollPane(maintenanceTable);
+        tableScroll.setBorder(BorderFactory.createTitledBorder("Maintenance Records"));
 
-        // Layout for the frame
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.add(panel);
-        mainPanel.add(buttonPanel);
-        mainPanel.add(tableScroll);
+        // Add sections to main panel
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        add(mainPanel, BorderLayout.NORTH);
+        add(tableScroll, BorderLayout.CENTER);
 
-        add(mainPanel);
+        // Action Listeners
+        addButton.addActionListener(e -> addMaintenance());
+        updateButton.addActionListener(e -> updateMaintenance());
+        deleteButton.addActionListener(e -> deleteMaintenance());
+        viewButton.addActionListener(e -> viewMaintenance());
+    }
 
-        // Button Actions
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addMaintenance();
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setBackground(new Color(100, 180, 255));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setPreferredSize(new Dimension(140, 35));
+        button.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(button.getBackground().brighter());
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(100, 180, 255));
             }
         });
 
-        updateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateMaintenance();
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteMaintenance();
-            }
-        });
-
-        viewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                viewMaintenance();
-            }
-        });
+        return button;
     }
 
     private void addMaintenance() {
@@ -126,12 +145,12 @@ public class MaintenanceScreen extends JFrame {
 
     private void updateMaintenance() {
         try {
-            String maintenanceIdText = maintenanceIdField.getText();
-            if (maintenanceIdText.isEmpty()) {
+            if (maintenanceIdField.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid Maintenance ID.");
                 return;
             }
-            int maintenanceId = Integer.parseInt(maintenanceIdText);
+
+            int maintenanceId = Integer.parseInt(maintenanceIdField.getText());
             String status = statusField.getText();
 
             if (status.isEmpty()) {
@@ -141,13 +160,11 @@ public class MaintenanceScreen extends JFrame {
 
             maintenanceDAO.updateMaintenanceStatus(maintenanceId, status);
             JOptionPane.showMessageDialog(this, "Maintenance status updated.");
-            viewMaintenance(); // Refresh the maintenance records view
+            viewMaintenance();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
-
-
 
     private void deleteMaintenance() {
         try {
@@ -161,22 +178,22 @@ public class MaintenanceScreen extends JFrame {
 
     private void viewMaintenance() {
         try {
-            // Retrieve maintenance records from the database
             List<Maintenance> maintenanceRecords = maintenanceDAO.getMaintenanceList();
-
-            // Convert the records into a 2D array for JTable
             String[][] data = new String[maintenanceRecords.size()][5];
+
             for (int i = 0; i < maintenanceRecords.size(); i++) {
-                Maintenance record = maintenanceRecords.get(i);
-                data[i][0] = String.valueOf(record.getMaintenanceId());
-                data[i][1] = String.valueOf(record.getRoomId());
-                data[i][2] = record.getIssueDescription();
-                data[i][3] = record.getScheduledDate();
-                data[i][4] = record.getStatus();
+                Maintenance m = maintenanceRecords.get(i);
+                data[i][0] = String.valueOf(m.getMaintenanceId());
+                data[i][1] = String.valueOf(m.getRoomId());
+                data[i][2] = m.getIssueDescription();
+                data[i][3] = m.getScheduledDate();
+                data[i][4] = m.getStatus();
             }
 
-            // Update the table model with the retrieved data
-            maintenanceTable.setModel(new javax.swing.table.DefaultTableModel(data, new String[]{"Maintenance ID", "Room ID", "Issue", "Scheduled Date", "Status"}));
+            maintenanceTable.setModel(new DefaultTableModel(
+                data,
+                new String[]{"Maintenance ID", "Room ID", "Issue", "Scheduled Date", "Status"}
+            ));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
@@ -191,11 +208,6 @@ public class MaintenanceScreen extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new MaintenanceScreen().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new MaintenanceScreen().setVisible(true));
     }
 }

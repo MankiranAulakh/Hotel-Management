@@ -1,12 +1,8 @@
 package hotelManagement.view;
 
 import javax.swing.*;
-
 import hotelManagement.dao.RoomDAO;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class RoomManagementScreen extends JFrame {
     private JTextField roomNumberField;
@@ -17,13 +13,19 @@ public class RoomManagementScreen extends JFrame {
 
     public RoomManagementScreen() {
         roomDAO = new RoomDAO();
+
         setTitle("Room Management");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 600);
+        setSize(750, 700);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(new Color(245, 248, 250));
 
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        // ===== Top Input Panel =====
+        JPanel inputPanel = new JPanel(new GridLayout(3, 2, 15, 15));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Room Information"));
+        //inputPanel.setBackground(new Color(244, 222, 252));
+
         roomNumberField = new JTextField();
         roomTypeField = new JTextField();
         priceField = new JTextField();
@@ -37,13 +39,17 @@ public class RoomManagementScreen extends JFrame {
 
         add(inputPanel, BorderLayout.NORTH);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        JButton addButton = new JButton("Add Room");
-        JButton updatePriceButton = new JButton("Update Price");
-        JButton getDetailsButton = new JButton("Get Room Details");
-        JButton deleteButton = new JButton("Delete Room");
-        JButton checkAvailabilityButton = new JButton("Check Room Availability");
-        JButton flagMaintenanceButton = new JButton("Flag for Maintenance");
+        // ===== Center Button Panel =====
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        buttonPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
+        buttonPanel.setBackground(new Color(230, 240, 255));
+
+        JButton addButton = createStyledButton("Add Room");
+        JButton updatePriceButton = createStyledButton("Update Price");
+        JButton getDetailsButton = createStyledButton("Get Room Details");
+        JButton deleteButton = createStyledButton("Delete Room");
+        JButton checkAvailabilityButton = createStyledButton("Check Room Availability");
+        JButton flagMaintenanceButton = createStyledButton("Flag for Maintenance");
 
         buttonPanel.add(addButton);
         buttonPanel.add(updatePriceButton);
@@ -54,147 +60,146 @@ public class RoomManagementScreen extends JFrame {
 
         add(buttonPanel, BorderLayout.CENTER);
 
+        // ===== Bottom Output Area =====
         outputArea = new JTextArea();
         outputArea.setEditable(false);
+        outputArea.setFont(new Font("Consolas", Font.PLAIN, 13));
+        outputArea.setBorder(BorderFactory.createTitledBorder("System Output"));
+
         JScrollPane scrollPane = new JScrollPane(outputArea);
+        scrollPane.setPreferredSize(new Dimension(700, 150));
         add(scrollPane, BorderLayout.SOUTH);
 
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String roomNumber = roomNumberField.getText();
-                String roomType = roomTypeField.getText();
-                String priceText = priceField.getText();
-
-                if (roomNumber.isEmpty() || roomType.isEmpty() || priceText.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please fill in all fields.");
-                    return;
-                }
-
-                try {
-                    double price = Double.parseDouble(priceText);
-                    roomDAO.addRoom(roomNumber, roomType, price);
-                    outputArea.setText("Room added successfully.\n");
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Invalid price format.");
-                }
-            }
-        });
-
-        updatePriceButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String roomNumber = roomNumberField.getText();
-                String priceText = priceField.getText();
-
-                if (roomNumber.isEmpty() || priceText.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Enter room number and new price.");
-                    return;
-                }
-
-                try {
-                    double newPrice = Double.parseDouble(priceText);
-                    roomDAO.updateRoomPrice(roomNumber, newPrice);
-                    outputArea.setText("Price updated successfully.\n");
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Invalid price format.");
-                }
-            }
-        });
-
-        getDetailsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String roomNumber = roomNumberField.getText();
-
-                if (roomNumber.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Enter room number to fetch details.");
-                    return;
-                }
-
-                outputArea.setText("Fetching room details...\n");
-
-                // Use a background thread to avoid freezing the UI
-                SwingUtilities.invokeLater(() -> {
-                    outputArea.setText(""); // clear first
-                    roomDAO.getRoomByNumber(roomNumber);
-                });
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String roomNumber = roomNumberField.getText();
-
-                if (roomNumber.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Enter room number to delete.");
-                    return;
-                }
-
-                roomDAO.deleteRoom(roomNumber);
-                outputArea.setText("Room deleted if existed.\n");
-            }
-        });
-        
-        checkAvailabilityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String roomNumberText = roomNumberField.getText();
-                String checkIn = JOptionPane.showInputDialog("Enter Check-in Date (YYYY-MM-DD):");
-                String checkOut = JOptionPane.showInputDialog("Enter Check-out Date (YYYY-MM-DD):");
-
-                if (roomNumberText.isEmpty() || checkIn.isEmpty() || checkOut.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please fill in all fields.");
-                    return;
-                }
-
-                try {
-                    int roomId = Integer.parseInt(roomNumberText);  // Convert room number to int
-
-                    boolean isAvailable = roomDAO.isRoomAvailable(roomId, checkIn, checkOut);
-
-                    if (isAvailable) {
-                        outputArea.setText("Room " + roomId + " is available for the given dates.\n");
-                    } else {
-                        outputArea.setText("Room " + roomId + " is not available for the given dates.\n");
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid room number.");
-                }
-            }
-        });
-
-
-        
-     // Flag Room for Maintenance
-        flagMaintenanceButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String roomNumber = roomNumberField.getText(); // Fetch the room number from the input field
-
-                if (roomNumber.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please provide a room number.");
-                    return;
-                }
-
-                try {
-                    int roomNumberInt = Integer.parseInt(roomNumber); // Convert the room number to an integer
-                    roomDAO.flagRoomForMaintenance(roomNumberInt); // Call the DAO method with the integer room number
-
-                    outputArea.setText("Room " + roomNumber + " has been flagged for maintenance.\n");
-
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid room number.");
-                }
-            }
-        });
-
+        // ===== Action Listeners =====
+        addButton.addActionListener(e -> addRoom());
+        updatePriceButton.addActionListener(e -> updatePrice());
+        getDetailsButton.addActionListener(e -> fetchRoomDetails());
+        deleteButton.addActionListener(e -> deleteRoom());
+        checkAvailabilityButton.addActionListener(e -> checkAvailability());
+        flagMaintenanceButton.addActionListener(e -> flagForMaintenance());
 
         setVisible(true);
     }
 
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new Color(244, 222, 252));
+        button.setForeground(Color.black);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        return button;
+    }
+
+    // ========== Action Methods ==========
+
+    private void addRoom() {
+        String roomNumber = roomNumberField.getText();
+        String roomType = roomTypeField.getText();
+        String priceText = priceField.getText();
+
+        if (roomNumber.isEmpty() || roomType.isEmpty() || priceText.isEmpty()) {
+            showMessage("Please fill in all fields.");
+            return;
+        }
+
+        try {
+            double price = Double.parseDouble(priceText);
+            roomDAO.addRoom(roomNumber, roomType, price);
+            outputArea.setText("✅ Room added successfully.\n");
+        } catch (NumberFormatException ex) {
+            showMessage("Invalid price format.");
+        }
+    }
+
+    private void updatePrice() {
+        String roomNumber = roomNumberField.getText();
+        String priceText = priceField.getText();
+
+        if (roomNumber.isEmpty() || priceText.isEmpty()) {
+            showMessage("Enter room number and new price.");
+            return;
+        }
+
+        try {
+            double newPrice = Double.parseDouble(priceText);
+            roomDAO.updateRoomPrice(roomNumber, newPrice);
+            outputArea.setText("✅ Price updated successfully.\n");
+        } catch (NumberFormatException ex) {
+            showMessage("Invalid price format.");
+        }
+    }
+
+    private void fetchRoomDetails() {
+        String roomNumber = roomNumberField.getText();
+
+        if (roomNumber.isEmpty()) {
+            showMessage("Enter room number to fetch details.");
+            return;
+        }
+
+        outputArea.setText("Fetching room details...\n");
+        SwingUtilities.invokeLater(() -> {
+            outputArea.setText(""); // Clear first
+            roomDAO.getRoomByNumber(roomNumber);
+        });
+    }
+
+    private void deleteRoom() {
+        String roomNumber = roomNumberField.getText();
+
+        if (roomNumber.isEmpty()) {
+            showMessage("Enter room number to delete.");
+            return;
+        }
+
+        roomDAO.deleteRoom(roomNumber);
+        outputArea.setText("🗑️ Room deleted if it existed.\n");
+    }
+
+    private void checkAvailability() {
+        String roomNumberText = roomNumberField.getText();
+        String checkIn = JOptionPane.showInputDialog("Enter Check-in Date (YYYY-MM-DD):");
+        String checkOut = JOptionPane.showInputDialog("Enter Check-out Date (YYYY-MM-DD):");
+
+        if (roomNumberText.isEmpty() || checkIn == null || checkOut == null ||
+                checkIn.isEmpty() || checkOut.isEmpty()) {
+            showMessage("Please fill in all fields.");
+            return;
+        }
+
+        try {
+            int roomId = Integer.parseInt(roomNumberText);
+            boolean isAvailable = roomDAO.isRoomAvailable(roomId, checkIn, checkOut);
+            outputArea.setText(isAvailable
+                    ? "✅ Room " + roomId + " is available for the given dates.\n"
+                    : "❌ Room " + roomId + " is not available for the given dates.\n");
+        } catch (NumberFormatException ex) {
+            showMessage("Please enter a valid room number.");
+        }
+    }
+
+    private void flagForMaintenance() {
+        String roomNumber = roomNumberField.getText();
+
+        if (roomNumber.isEmpty()) {
+            showMessage("Please provide a room number.");
+            return;
+        }
+
+        try {
+            int roomNumberInt = Integer.parseInt(roomNumber);
+            roomDAO.flagRoomForMaintenance(roomNumberInt);
+            outputArea.setText("🛠️ Room " + roomNumber + " has been flagged for maintenance.\n");
+        } catch (NumberFormatException ex) {
+            showMessage("Please enter a valid room number.");
+        }
+    }
+
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
     public static void main(String[] args) {
-        new RoomManagementScreen();
+        SwingUtilities.invokeLater(RoomManagementScreen::new);
     }
 }

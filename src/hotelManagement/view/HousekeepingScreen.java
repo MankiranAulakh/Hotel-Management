@@ -21,21 +21,24 @@ public class HousekeepingScreen extends JFrame {
     public HousekeepingScreen() {
         housekeepingDAO = new HousekeepingDAO();
         setTitle("\uD83C\uDFE8 Housekeeping Management");
-        setSize(850, 700);
+        setSize(750, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // ======= Main Panel with background color =======
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(new Color(247, 239, 208));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        // ==== Form Panel (GridBagLayout like GuestManagementScreen) ====
+        // ======= Form Panel =======
         JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(new Color(245, 248, 250));
         formPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.GRAY), "Manage Housekeeping",
-            TitledBorder.LEFT, TitledBorder.TOP, new Font("Segoe UI", Font.BOLD, 14)));
+                BorderFactory.createLineBorder(Color.GRAY), "Manage Housekeeping",
+                TitledBorder.LEFT, TitledBorder.TOP, new Font("Segoe UI", Font.BOLD, 14)));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         housekeepingIdField = new JTextField();
@@ -45,29 +48,30 @@ public class HousekeepingScreen extends JFrame {
         statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
 
         JLabel[] labels = {
-            new JLabel("Housekeeping ID:"),
-            new JLabel("Room ID:"),
-            new JLabel("Assigned Staff:"),
-            new JLabel("Cleaning Status:"),
-            new JLabel("Last Cleaned (yyyy-MM-dd HH:mm:ss):")
+                new JLabel("Housekeeping ID:"),
+                new JLabel("Room ID:"),
+                new JLabel("Assigned Staff:"),
+                new JLabel("Cleaning Status:"),
+                new JLabel("Last Cleaned (yyyy-MM-dd HH:mm:ss):")
         };
 
         JComponent[] fields = {
-            housekeepingIdField, roomIdField, staffField, statusComboBox, lastCleanedField
+                housekeepingIdField, roomIdField, staffField, statusComboBox, lastCleanedField
         };
 
         for (int i = 0; i < labels.length; i++) {
+            labels[i].setFont(new Font("Segoe UI", Font.PLAIN, 13));
             gbc.gridx = 0;
             gbc.gridy = i;
             formPanel.add(labels[i], gbc);
 
             gbc.gridx = 1;
-            gbc.gridy = i;
             formPanel.add(fields[i], gbc);
         }
 
-        // ==== Button Panel with consistent styling ====
+        // ======= Button Panel =======
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        buttonPanel.setBackground(new Color(247, 239, 208));
 
         addButton = new JButton("Add Record");
         updateButton = new JButton("Update Status");
@@ -79,18 +83,19 @@ public class HousekeepingScreen extends JFrame {
             btn.setBackground(new Color(51, 153, 255));
             btn.setForeground(Color.WHITE);
             btn.setFocusPainted(false);
-            btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
             buttonPanel.add(btn);
         }
 
-        // ==== Table Panel ====
+        // ======= Table Panel =======
         housekeepingTable = new JTable(new DefaultTableModel(new Object[][]{},
                 new String[]{"Housekeeping ID", "Room ID", "Assigned Staff", "Cleaning Status", "Last Cleaned"}));
         JScrollPane tableScroll = new JScrollPane(housekeepingTable);
         tableScroll.setBorder(BorderFactory.createTitledBorder("Housekeeping Records"));
         tableScroll.setPreferredSize(new Dimension(760, 200));
 
-        // ==== Display Area ====
+        // ======= Display Area =======
         displayArea = new JTextArea(3, 50);
         displayArea.setEditable(false);
         displayArea.setLineWrap(true);
@@ -100,18 +105,20 @@ public class HousekeepingScreen extends JFrame {
         JScrollPane displayScroll = new JScrollPane(displayArea);
         displayScroll.setBorder(BorderFactory.createTitledBorder("Status"));
 
-        // ==== Layout Panels ====
+        // ======= Top Panel Structure (Form + Buttons) =======
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
+        topPanel.setBackground(new Color(162, 215, 250));
         topPanel.add(formPanel, BorderLayout.CENTER);
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+        // ======= Add to Main Panel =======
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(tableScroll, BorderLayout.CENTER);
         mainPanel.add(displayScroll, BorderLayout.SOUTH);
 
         add(mainPanel);
 
-        // ==== Action Listeners ====
+        // ======= Action Listeners =======
         addButton.addActionListener(e -> addHousekeeping());
         updateButton.addActionListener(e -> updateHousekeepingStatus());
         deleteButton.addActionListener(e -> deleteHousekeepingRecord());

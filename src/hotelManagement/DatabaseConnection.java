@@ -9,7 +9,7 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
     private Connection connection;
 
-    private static final String URL = "jdbc:mysql://44.211.45.143:3306/testdb";
+    private static final String URL = "jdbc:mysql://3.94.86.248:3306/testdb";
     private static final String USER = "newuser";
     private static final String PASSWORD = "password";
 

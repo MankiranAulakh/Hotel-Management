@@ -10,14 +10,14 @@ public class Main extends JFrame {
 
     public Main() {
         setTitle("Hotel Management System");
-        setSize(700, 650);
+        setSize(750, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 248, 250)); // light background
 
         // Title
-        JLabel titleLabel = new JLabel("🏨 Hotel Management Dashboard", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Hotel Management Dashboard", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(new Color(33, 37, 41));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
