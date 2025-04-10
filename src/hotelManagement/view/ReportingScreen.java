@@ -18,7 +18,7 @@ public class ReportingScreen extends JFrame {
     private JTextArea reportTextArea;
 
     public ReportingScreen() {
-        setTitle("📊 Reporting Dashboard");
+        setTitle("Reporting Dashboard");
         setSize(750, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -27,7 +27,7 @@ public class ReportingScreen extends JFrame {
         mainPanel.setBackground(new Color(211, 219, 219));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        // === Top Navigation with Dashboard Button ===
+        // Top Navigation with Dashboard Button 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
@@ -36,7 +36,7 @@ public class ReportingScreen extends JFrame {
         dashboardButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         dashboardButton.addActionListener(e -> {
             dispose();
-            new Main().setVisible(true); // Replace with your dashboard call
+            new Main().setVisible(true); 
         });
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -46,7 +46,7 @@ public class ReportingScreen extends JFrame {
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // === Form Panel ===
+        // Form Panel 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(new Color(245, 248, 250));
         formPanel.setBorder(BorderFactory.createTitledBorder(
@@ -97,7 +97,7 @@ public class ReportingScreen extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         formPanel.add(generateReportButton, gbc);
 
-        // === Report Display Area ===
+        // Report Display Area 
         reportTextArea = new JTextArea(12, 50);
         reportTextArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         reportTextArea.setEditable(false);
@@ -107,13 +107,13 @@ public class ReportingScreen extends JFrame {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Report Output"));
         scrollPane.setPreferredSize(new Dimension(700, 250));
 
-        // === Assemble Panels ===
+        // Assemble Panels
         mainPanel.add(formPanel, BorderLayout.CENTER);
         mainPanel.add(scrollPane, BorderLayout.SOUTH);
 
         add(mainPanel);
 
-        // === Action Listener ===
+        // Action Listener 
         generateReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

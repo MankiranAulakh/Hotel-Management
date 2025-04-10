@@ -21,13 +21,13 @@ public class BillingScreen extends JFrame {
         setLayout(new BorderLayout(15, 15));
         getContentPane().setBackground(Color.decode("#f4f6f8"));
 
-        // ===== Title =====
+        // Title 
         JLabel titleLabel = new JLabel("Billing & Payment", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         add(titleLabel, BorderLayout.NORTH);
 
-        // ===== Input Panel =====
+        // Input Panel 
         JPanel inputPanel = new JPanel(new GridLayout(7, 2, 12, 12));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Billing Information"));
         inputPanel.setBackground(Color.white);
@@ -64,7 +64,7 @@ public class BillingScreen extends JFrame {
 
         add(inputPanel, BorderLayout.WEST);
 
-        // ===== Button Panel =====
+        // Button Panel 
         JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 10, 10));
         buttonPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
         buttonPanel.setBackground(Color.white);
@@ -82,7 +82,7 @@ public class BillingScreen extends JFrame {
 
         add(buttonPanel, BorderLayout.CENTER);
 
-        // ===== Output Panel =====
+        // Output Panel 
         outputArea = new JTextArea(10, 40);
         outputArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
         outputArea.setLineWrap(true);
@@ -92,7 +92,7 @@ public class BillingScreen extends JFrame {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Output"));
         add(scrollPane, BorderLayout.SOUTH);
 
-        // ===== Button Actions =====
+        // Button Actions 
         addBtn.addActionListener(e -> {
             try {
                 int reservationId = Integer.parseInt(reservationIdField.getText());

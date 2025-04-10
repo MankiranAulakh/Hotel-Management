@@ -88,7 +88,7 @@ public class Guest {
         this.idProof = idProof;
     }
 
-    // Optional: toString() method for easy logging
+    // toString() method for easy logging
     @Override
     public String toString() {
         return "Guest ID: " + guestId + "\n" +

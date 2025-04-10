@@ -15,9 +15,9 @@ public class InventoryNotifier implements Observer {
     }
 
     private void sendAlert(double inventoryLevel) {
-        // Example of sending an alert (you can replace this with actual logic)
+        // Example of sending an alert 
         System.out.println("ALERT: Inventory level is low! Current inventory: " + inventoryLevel);
-        // Add functionality to send email, SMS, or push notifications
+        
     }
 }
 

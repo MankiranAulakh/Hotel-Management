@@ -37,7 +37,7 @@ public class HousekeepingList {
         return lastCleaned;
     }
 
-    // Setters (if needed)
+    // Setters
     public void setHousekeepingId(int housekeepingId) {
         this.housekeepingId = housekeepingId;
     }

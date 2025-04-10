@@ -25,12 +25,12 @@ public class HousekeepingScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // ======= Main Panel with background color =======
+        // Main Panel with background color 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(new Color(247, 239, 208));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        // ======= Form Panel =======
+        // Form Panel 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(new Color(245, 248, 250));
         formPanel.setBorder(BorderFactory.createTitledBorder(
@@ -69,7 +69,7 @@ public class HousekeepingScreen extends JFrame {
             formPanel.add(fields[i], gbc);
         }
 
-        // ======= Button Panel =======
+        // Button Panel 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         buttonPanel.setBackground(new Color(247, 239, 208));
 
@@ -88,14 +88,14 @@ public class HousekeepingScreen extends JFrame {
             buttonPanel.add(btn);
         }
 
-        // ======= Table Panel =======
+        // Table Panel 
         housekeepingTable = new JTable(new DefaultTableModel(new Object[][]{},
                 new String[]{"Housekeeping ID", "Room ID", "Assigned Staff", "Cleaning Status", "Last Cleaned"}));
         JScrollPane tableScroll = new JScrollPane(housekeepingTable);
         tableScroll.setBorder(BorderFactory.createTitledBorder("Housekeeping Records"));
         tableScroll.setPreferredSize(new Dimension(760, 200));
 
-        // ======= Display Area =======
+        // Display Area 
         displayArea = new JTextArea(3, 50);
         displayArea.setEditable(false);
         displayArea.setLineWrap(true);
@@ -105,20 +105,20 @@ public class HousekeepingScreen extends JFrame {
         JScrollPane displayScroll = new JScrollPane(displayArea);
         displayScroll.setBorder(BorderFactory.createTitledBorder("Status"));
 
-        // ======= Top Panel Structure (Form + Buttons) =======
+        // Top Panel Structure (Form + Buttons) 
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
         topPanel.setBackground(new Color(162, 215, 250));
         topPanel.add(formPanel, BorderLayout.CENTER);
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // ======= Add to Main Panel =======
+        // Add to Main Panel 
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(tableScroll, BorderLayout.CENTER);
         mainPanel.add(displayScroll, BorderLayout.SOUTH);
 
         add(mainPanel);
 
-        // ======= Action Listeners =======
+        // Action Listeners 
         addButton.addActionListener(e -> addHousekeeping());
         updateButton.addActionListener(e -> updateHousekeepingStatus());
         deleteButton.addActionListener(e -> deleteHousekeepingRecord());

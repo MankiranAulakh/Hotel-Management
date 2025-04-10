@@ -21,7 +21,7 @@ public class RoomManagementScreen extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 248, 250));
 
-        // ===== Top Input Panel =====
+        // Top Input Panel 
         JPanel inputPanel = new JPanel(new GridLayout(3, 2, 15, 15));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Room Information"));
         //inputPanel.setBackground(new Color(244, 222, 252));
@@ -39,7 +39,7 @@ public class RoomManagementScreen extends JFrame {
 
         add(inputPanel, BorderLayout.NORTH);
 
-        // ===== Center Button Panel =====
+        // Center Button Panel 
         JPanel buttonPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         buttonPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
         buttonPanel.setBackground(new Color(230, 240, 255));
@@ -60,7 +60,7 @@ public class RoomManagementScreen extends JFrame {
 
         add(buttonPanel, BorderLayout.CENTER);
 
-        // ===== Bottom Output Area =====
+        // Bottom Output Area
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         outputArea.setFont(new Font("Consolas", Font.PLAIN, 13));
@@ -70,7 +70,7 @@ public class RoomManagementScreen extends JFrame {
         scrollPane.setPreferredSize(new Dimension(700, 150));
         add(scrollPane, BorderLayout.SOUTH);
 
-        // ===== Action Listeners =====
+        // Action Listeners 
         addButton.addActionListener(e -> addRoom());
         updatePriceButton.addActionListener(e -> updatePrice());
         getDetailsButton.addActionListener(e -> fetchRoomDetails());
@@ -90,7 +90,7 @@ public class RoomManagementScreen extends JFrame {
         return button;
     }
 
-    // ========== Action Methods ==========
+    // Action Methods 
 
     private void addRoom() {
         String roomNumber = roomNumberField.getText();

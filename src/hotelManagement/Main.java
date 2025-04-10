@@ -1,3 +1,8 @@
+// Hotel Management System
+// COMP 371 Final Project
+// Mankiran Kaur Aulakh
+// 300189703
+
 package hotelManagement;
 
 import javax.swing.*;

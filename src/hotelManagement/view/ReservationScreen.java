@@ -33,7 +33,7 @@ public class ReservationScreen extends JFrame {
         addEventListeners();
     }
 
-    // ========================= Initialize Table =========================
+    // Initialize Table 
     private void initializeTable() {
         tableModel = new DefaultTableModel();
         table = new JTable(tableModel);
@@ -45,7 +45,7 @@ public class ReservationScreen extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
- // ========================= Input Panel =========================
+ // Input Panel 
     private JPanel createInputPanel() {
         JPanel panel = new JPanel(new GridLayout(8, 2, 10, 10)); // 8 rows, 2 columns
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -66,8 +66,8 @@ public class ReservationScreen extends JFrame {
         panel.add(new JLabel("Room Type:"));
         panel.add(roomTypeBox);
 
-        panel.add(new JLabel("")); // Empty cell for alignment
-        panel.add(findRoomButton); // Place Find Room button in the second column
+        panel.add(new JLabel("")); 
+        panel.add(findRoomButton); 
 
         panel.add(new JLabel("Room ID:"));
         panel.add(roomIdField);
@@ -88,7 +88,7 @@ public class ReservationScreen extends JFrame {
     }
 
 
-    // ========================= Button Panel =========================
+    // Button Panel 
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
@@ -103,7 +103,7 @@ public class ReservationScreen extends JFrame {
         return panel;
     }
 
-    // ========================= Load Reservations from DB =========================
+    // Load Reservations from DB 
     private void loadReservations() {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -130,7 +130,7 @@ public class ReservationScreen extends JFrame {
         }
     }
 
-    // ========================= Event Listeners =========================
+    // Event Listeners 
     private void addEventListeners() {
         // Add Reservation
         addButton.addActionListener(e -> {
@@ -223,7 +223,7 @@ public class ReservationScreen extends JFrame {
         });
     }
 
-    // ========================= Helper Methods =========================
+    // Helper Methods 
     private void clearInputs() {
         guestIdField.setText("");
         roomIdField.setText("");

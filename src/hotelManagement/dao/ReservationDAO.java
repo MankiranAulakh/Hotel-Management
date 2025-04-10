@@ -62,6 +62,7 @@ public class ReservationDAO {
         }
     }
     
+    // method to update reservation details
     public void updateReservation(int reservationId, int guestId, int roomId, String checkIn, String checkOut, double totalAmount, String paymentStatus) {
         String sql = "UPDATE Reservations SET guest_id = ?, room_id = ?, check_in = ?, check_out = ?, total_amount = ?, payment_status = ? WHERE reservation_id = ?";
         
@@ -133,6 +134,7 @@ public class ReservationDAO {
         }
     }
 
+    // method to check if room is available
     public static boolean isRoomAvailable(int roomId, String checkIn, String checkOut) {
         String sql = "SELECT COUNT(*) FROM Reservations WHERE room_id = ? " + 
                      "AND (check_in < ? AND check_out > ?)";

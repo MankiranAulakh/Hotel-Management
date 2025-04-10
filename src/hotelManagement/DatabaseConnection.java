@@ -13,7 +13,7 @@ public class DatabaseConnection {
     private static final String USER = "newuser";
     private static final String PASSWORD = "password";
 
-    // Step 1: Private constructor
+    // Private constructor
     private DatabaseConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -24,7 +24,7 @@ public class DatabaseConnection {
         }
     }
 
-    // Step 2: Public static method to get the singleton instance
+    // Public static method to get the singleton instance
     public static DatabaseConnection getInstance() throws SQLException {
         if (instance == null || instance.getConnection().isClosed()) {
             instance = new DatabaseConnection();
@@ -32,7 +32,7 @@ public class DatabaseConnection {
         return instance;
     }
 
-    // Step 3: Public method to get the JDBC connection
+    // Public method to get the JDBC connection
     public Connection getConnection() {
         return connection;
     }
